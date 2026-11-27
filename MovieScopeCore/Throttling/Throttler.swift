@@ -28,6 +28,9 @@ public final class Throttler<Value: Sendable> {
         self.action = action
     }
 
+    /// Whether a throttle window is currently open (values would be held).
+    public var isWindowOpen: Bool { window != nil }
+
     /// Submits a value: fires now if no window is open, otherwise keeps it as
     /// the pending value for the end of the window.
     public func send(_ value: Value) {

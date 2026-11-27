@@ -47,11 +47,11 @@ Notes:
 | Brief | Implementation |
 |---|---|
 | Trending movies in a collection view with a custom layout | `UICollectionView` with a custom compositional layout. A featured row of backdrop cards pages sideways; below it, a self-sizing poster grid fits as many columns as the width allows (2 on iPhone portrait, 4–7 on iPad). |
-| Infinite scrolling | `PaginationController`. The next page loads 6 items from the end. Overlapping pages are de-duplicated by identity, only one request runs at a time, a failed page offers a retry, and paging stops at TMDB's 500-page limit. |
+| Infinite scrolling | `PaginationController`. The next page loads 6 items from the end. Overlapping pages are de-duplicated by identity, only one request runs at a time, a failed page shows Try Again in a footer (a failed refresh retries as a refresh), and paging stops at TMDB's 500-page limit. |
 | Title, image and short description | Each card shows the poster, rating badge, title (2 lines) and overview (3 lines). |
 | Details screen with extended content | A scrollable SwiftUI screen for **movies and TV shows**:<br>• backdrop, poster, tagline, year, runtime or seasons/episodes, genres<br>• rating and vote count<br>• overview<br>• directors and writers (movies) or creators (TV): the brief's "authors"<br>• cast<br>• up to 3 reviews with their authors<br>• status, language, budget/revenue or networks |
 | Search movies and series, kind chosen in advance, throttleable | `.searchable` with a **Movies / TV Shows** scope that is shown as soon as search opens. Queries are **throttled**: the first fires immediately, then at most one per 400 ms, always ending with the latest text. Older requests are cancelled and their late responses dropped. |
-| Images fetched based on view size | Every image requests the smallest TMDB size at least as wide as its **rendered pixel width** (points × screen scale), then is downsampled to exactly that size. |
+| Images fetched based on view size | Every image requests the smallest TMDB size that covers its **rendered size in pixels** (points × screen scale, accounting for aspect-fill), then is downsampled to that size. |
 | Bonus: local favorites with an indicator | Heart in Details, a badge on cards and search rows, a long-press menu on Trending, and a Favorites tab. Stored in a JSON file owned by an actor; works offline. |
 | Bonus: pre-cache via concurrent/queued download | Collection view prefetching feeds the image pipeline, which allows at most 6 downloads at once (`RequestLimiter`). |
 | Bonus: low-res image before the final one | Details shows the poster already cached from the grid instantly, then cross-fades to the full-size image. |
@@ -131,7 +131,7 @@ Every target uses Swift 6 language mode, so data-race safety is checked at compi
 **No escape hatches.** There is no `@unchecked Sendable`, no `nonisolated(unsafe)` and no lock-wrapped boxes. `NSCache` isn't `Sendable`, so it never leaves its actor. Test-only shared state uses `Synchronization.Mutex`.
 
 **Cancellation is end to end:**
-- Leaving a screen cancels its work (`.task`).
+- Leaving a details screen cancels its request (`.task`).
 - Reused cells cancel their image loads.
 - The last caller giving up on an image cancels its download.
 - A new search cancels the previous one.
@@ -143,6 +143,7 @@ Every target uses Swift 6 language mode, so data-race safety is checked at compi
 - It percent-encodes query values strictly (`Amélie & Co`, `東京` and `+` survive).
 - It maps every failure to `APIError`.
 - It retries an HTTP 429 once.
+- API responses are never cached on disk (an ephemeral session without a URL cache), so search queries don't persist and a refresh always hits the network.
 
 **DTO mapping** absorbs TMDB's quirks: empty date strings, `0` meaning "unknown", the same person credited for several jobs.
 
@@ -152,6 +153,7 @@ Every target uses Swift 6 language mode, so data-race safety is checked at compi
 - **Size selection:** `ImageSizeSelector` picks the smallest `wNNN` size at least as wide as the rendered pixels. It ignores height-based tokens (`h632`) and never picks `original`. Size lists come from `/configuration`, cached for 7 days, with a built-in fallback.
 - **De-duplication:** concurrent requests for the same image share one download.
 - **Prefetching:** prefetches use the exact size cells render at, so they hit the same cache entries.
+- **Offline:** if `/configuration` can't be fetched, the store backs off for a minute instead of retrying on every image load.
 - **Reused cells:** cancellation plus a key check stop a slow image from landing in a reused cell.
 
 ## Environments, schemes and secrets
@@ -170,7 +172,7 @@ Every target uses Swift 6 language mode, so data-race safety is checked at compi
 
 | Variable | Default | Effect |
 |---|---|---|
-| `MOVIESCOPE_LOG_LEVEL` | on (`debug`) | Log verbosity |
+| `MOVIESCOPE_LOG_LEVEL` | on (`debug`) | `debug` logs every API request: path, status, and headers with the token redacted |
 | `MOVIESCOPE_FIXTURES` | off | Use bundled test data instead of the network |
 | `MOVIESCOPE_RESET_STATE` | off | Wipe favorites and cached configuration at launch |
 
@@ -185,11 +187,11 @@ Dev builds also accept a `TMDB_ACCESS_TOKEN` environment variable, from a local 
 
 | Target | Tests | What they cover |
 |---|---|---|
-| `MovieScopeCoreTests` | 108 | Networking (URL building, encoding, status mapping, retry, cancellation, URLSession via a `URLProtocol` stub), decoding of captured TMDB fixtures, DTO mapping edge cases, pagination, throttling, image sizing/configuration/pipeline/limiter, favorites persistence |
-| `MovieScopeTests` | 57 | View models (Trending, Details, Search including stale first and next pages, Favorites), layout math, snapshot building, formatters, composition root |
-| `MovieScopeUITests` | 10 | Trending with page 2 and rotation, details, search with scope switch, favorites, setup screen, attribution, largest Dynamic Type, and one **recorded** flow |
+| `MovieScopeCoreTests` | 117 | Networking (URL building, encoding, status mapping, retry, cancellation, URLSession via a `URLProtocol` stub), decoding of captured TMDB fixtures, DTO mapping edge cases, pagination, throttling, image sizing/configuration/pipeline/limiter, favorites persistence |
+| `MovieScopeTests` | 60 | View models (Trending, Details, Search including stale first and next pages, Favorites), the reused-cell image protection, layout math, snapshot building, formatters, composition root |
+| `MovieScopeUITests` | 11 | Trending with page 2, a failing page 2 and retry, and rotation, details, search with scope switch, favorites, setup screen, attribution, largest Dynamic Type, and one **recorded** flow |
 
-- **Coverage:** **95% line coverage on `MovieScopeCore.framework`**. `./Scripts/coverage.sh` runs the unit tests and fails below 80%.
+- **Coverage:** **95.6% line coverage on `MovieScopeCore.framework`**. `./Scripts/coverage.sh` runs the unit tests and fails below 80%.
 - **Async tests** use `await fulfillment(of:)`.
 - **Inverted expectations** check things that must *not* happen: a stale result applied, a throttled call sent.
 - **Determinism:** time-based logic is driven by a controllable `Sleeper` (`TestSupport/ControlledSleeper.swift`) instead of real delays.

@@ -57,4 +57,15 @@ final class FixtureTransportTests: XCTestCase {
     private func request(_ string: String) throws -> URLRequest {
         URLRequest(url: try XCTUnwrap(URL(string: string)))
     }
+
+    func test_failingOncePath_failsFirstRequestThenSucceeds() async throws {
+        let sut = FixtureTransport(bundle: FixtureLoader.bundle, failingOnce: ["/3/trending/movie/week?page=2"])
+        let request = try request("https://api.themoviedb.org/3/trending/movie/week?page=2&language=en-US")
+
+        let first = try await sut.data(for: request).1.statusCode
+        let second = try await sut.data(for: request).1.statusCode
+
+        XCTAssertEqual(first, 503)
+        XCTAssertEqual(second, 200)
+    }
 }

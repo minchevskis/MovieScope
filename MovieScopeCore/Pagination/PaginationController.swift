@@ -35,6 +35,7 @@ public final class PaginationController<Item: Identifiable & Sendable> where Ite
     @ObservationIgnored private var inFlight: Task<Void, Never>?
     @ObservationIgnored private var generation = 0
     @ObservationIgnored private var failedPage: Int?
+    @ObservationIgnored private var failedRequestReplacedItems = false
 
     public init(fetch: @escaping Fetch) {
         self.fetch = fetch
@@ -52,10 +53,11 @@ public final class PaginationController<Item: Identifiable & Sendable> where Ite
         await load(page: next, replacingItems: false)
     }
 
-    /// Repeats the request that failed.
+    /// Repeats the request that failed. A failed refresh is retried as a
+    /// refresh, so it replaces the list instead of appending page 1 to it.
     public func retry() async {
         guard isFailed, let page = failedPage else { return }
-        await load(page: page, replacingItems: false)
+        await load(page: page, replacingItems: failedRequestReplacedItems)
     }
 
     /// Reloads from page 1. Current items stay visible until the new page arrives.
@@ -97,7 +99,7 @@ public final class PaginationController<Item: Identifiable & Sendable> where Ite
                 let result = try await fetch(page)
                 apply(result, generation: generation, replacingItems: replacingItems)
             } catch {
-                fail(with: APIError(error), page: page, generation: generation)
+                fail(with: APIError(error), page: page, replacingItems: replacingItems, generation: generation)
             }
         }
         inFlight = task
@@ -114,10 +116,11 @@ public final class PaginationController<Item: Identifiable & Sendable> where Ite
         inFlight = nil
     }
 
-    private func fail(with error: APIError, page: Int, generation: Int) {
+    private func fail(with error: APIError, page: Int, replacingItems: Bool, generation: Int) {
         guard generation == self.generation, error != .cancelled else { return }
         phase = .failed(error)
         failedPage = page
+        failedRequestReplacedItems = replacingItems
         inFlight = nil
     }
 }

@@ -1,4 +1,5 @@
 import Foundation
+import Synchronization
 
 /// Serves captured TMDB responses (`*.fixture.json`) and generated artwork
 /// instead of hitting the network. The app uses it when launched with
@@ -13,9 +14,13 @@ public struct FixtureTransport: HTTPTransport {
     ]
 
     private let fixtures: [String: Data]
+    private let failures: FailureBudget
 
-    /// Loads every fixture from `bundle` up front.
-    public init(bundle: Bundle) {
+    /// Loads every fixture from `bundle` up front. Requests listed in
+    /// `failingOnce` (path plus `?page=N`, e.g. `/3/trending/movie/week?page=2`)
+    /// fail with HTTP 503 the first time, to exercise retry UI in UI tests.
+    public init(bundle: Bundle, failingOnce: Set<String> = []) {
+        failures = FailureBudget(failingOnce)
         var fixtures: [String: Data] = [:]
         for name in Self.fixtureNames {
             if let url = bundle.url(forResource: name, withExtension: "fixture.json"),
@@ -32,6 +37,9 @@ public struct FixtureTransport: HTTPTransport {
             let seed = url.lastPathComponent.unicodeScalars.reduce(0) { $0 &+ Int($1.value) }
             let artwork = PlaceholderImageFactory.pngData(width: 342, height: 513, seed: seed)
             return try respond(url, status: 200, body: artwork)
+        }
+        if failures.consume(Self.failureKey(for: url)) {
+            return try respond(url, status: 503, body: Data(#"{"status_code":503,"success":false}"#.utf8))
         }
         guard let name = fixtureName(for: url), let body = fixtures[name] else {
             return try respond(url, status: 404, body: Data(#"{"status_code":34,"success":false}"#.utf8))
@@ -55,6 +63,12 @@ public struct FixtureTransport: HTTPTransport {
         }
     }
 
+    private static func failureKey(for url: URL) -> String {
+        let page = URLComponents(url: url, resolvingAgainstBaseURL: false)?
+            .queryItems?.first { $0.name == "page" }?.value
+        return url.path() + (page.map { "?page=" + $0 } ?? "")
+    }
+
     private func respond(_ url: URL, status: Int, body: Data) throws -> (Data, HTTPURLResponse) {
         guard let response = HTTPURLResponse(
             url: url,
@@ -63,5 +77,18 @@ public struct FixtureTransport: HTTPTransport {
             headerFields: ["Content-Type": "application/json"]
         ) else { throw APIError.invalidResponse }
         return (body, response)
+    }
+}
+
+/// Requests that should fail once; thread-safe so the transport stays `Sendable`.
+private final class FailureBudget: Sendable {
+    private let remaining: Mutex<Set<String>>
+
+    init(_ keys: Set<String>) {
+        remaining = Mutex(keys)
+    }
+
+    func consume(_ key: String) -> Bool {
+        remaining.withLock { $0.remove(key) != nil }
     }
 }

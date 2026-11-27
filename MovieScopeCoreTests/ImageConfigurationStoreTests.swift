@@ -1,5 +1,6 @@
 import Foundation
 @testable import MovieScopeCore
+import Synchronization
 import XCTest
 
 final class ImageConfigurationStoreTests: XCTestCase {
@@ -70,6 +71,28 @@ final class ImageConfigurationStoreTests: XCTestCase {
 
         let calls = await service.configurationCalls
         XCTAssertEqual(calls, 1)
+    }
+
+    func test_store_afterFailure_waitsBeforeFetchingAgain() async {
+        let clock = Mutex(now)
+        let service = StubConfigurationService([.failure(APIError.transport(.timedOut)), .success(Self.remote)])
+        let sut = ImageConfigurationStore(
+            service: service,
+            fileURL: temporaryFileURL(),
+            retryInterval: 60,
+            now: { clock.withLock { $0 } }
+        )
+
+        let first = await sut.current()
+        let second = await sut.current()
+        let callsWhileBackingOff = await service.configurationCalls
+        clock.withLock { $0 = $0.addingTimeInterval(61) }
+        let third = await sut.current()
+
+        XCTAssertEqual(first, .fallback)
+        XCTAssertEqual(second, .fallback)
+        XCTAssertEqual(callsWhileBackingOff, 1, "No request storm while offline")
+        XCTAssertEqual(third, Self.remote)
     }
 
     func test_store_corruptFile_isIgnored() async throws {

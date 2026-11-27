@@ -14,19 +14,22 @@ public struct TMDBClient: Sendable {
     private let credentials: any CredentialProvider
     private let retryDelay: Duration
     private let sleeper: any Sleeper
+    private let logsRequests: Bool
 
     public init(
         baseURL: URL = TMDBClient.defaultBaseURL,
         transport: any HTTPTransport,
         credentials: any CredentialProvider,
         retryDelay: Duration = .seconds(1),
-        sleeper: any Sleeper = TaskSleeper()
+        sleeper: any Sleeper = TaskSleeper(),
+        logsRequests: Bool = false
     ) {
         self.baseURL = baseURL
         self.transport = transport
         self.credentials = credentials
         self.retryDelay = retryDelay
         self.sleeper = sleeper
+        self.logsRequests = logsRequests
     }
 
     public func send<Response>(_ endpoint: Endpoint<Response>) async throws -> Response {
@@ -83,8 +86,9 @@ public struct TMDBClient: Sendable {
 
     private func perform(_ request: URLRequest, retriesLeft: Int) async throws -> Data {
         let (data, response) = try await load(request)
-        let path = request.url?.path() ?? ""
-        Log.network.debug("GET \(path, privacy: .public) → \(response.statusCode)")
+        if logsRequests {
+            Log.network.info("\(Log.requestLine(for: request, status: response.statusCode), privacy: .public)")
+        }
 
         switch response.statusCode {
         case 200..<300:

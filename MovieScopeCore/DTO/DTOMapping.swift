@@ -41,11 +41,28 @@ extension CreditsDTO {
         crew.filter { $0.department == "Writing" }.uniquePeople()
     }
 
+    /// Top-billed cast, one entry per person: actors credited for several
+    /// characters get them joined ("A / B"), keeping identities unique.
     func cast(limit: Int) -> [CastMember] {
-        cast.sorted { ($0.order ?? .max) < ($1.order ?? .max) }
-            .prefix(limit)
-            .map { CastMember(person: Person(id: $0.id, name: $0.name, profilePath: $0.profilePath.nonEmpty),
-                              character: $0.character ?? "") }
+        var order: [Int] = []
+        var characters: [Int: [String]] = [:]
+        var people: [Int: CastDTO] = [:]
+        for member in cast.sorted(by: { ($0.order ?? .max) < ($1.order ?? .max) }) {
+            if people[member.id] == nil {
+                order.append(member.id)
+                people[member.id] = member
+            }
+            if let character = member.character, !character.isEmpty {
+                characters[member.id, default: []].append(character)
+            }
+        }
+        return order.prefix(limit).compactMap { id in
+            guard let member = people[id] else { return nil }
+            return CastMember(
+                person: Person(id: member.id, name: member.name, profilePath: member.profilePath.nonEmpty),
+                character: (characters[id] ?? []).joined(separator: " / ")
+            )
+        }
     }
 }
 

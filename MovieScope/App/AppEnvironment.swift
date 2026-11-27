@@ -12,6 +12,8 @@ nonisolated struct AppEnvironment: Equatable {
     let forcesMissingToken: Bool
     /// The app is the host process of a unit-test bundle; skip building the UI.
     let isHostingUnitTests: Bool
+    /// UI tests only: in fixture mode, the first request for trending page 2 fails.
+    let failsSecondTrendingPageOnce: Bool
     let logLevel: String
 
     init(processEnvironment: [String: String]) {
@@ -19,6 +21,7 @@ nonisolated struct AppEnvironment: Equatable {
         resetsState = processEnvironment["MOVIESCOPE_RESET_STATE"] == "1"
         forcesMissingToken = processEnvironment["MOVIESCOPE_FORCE_NO_TOKEN"] == "1"
         isHostingUnitTests = processEnvironment["XCTestConfigurationFilePath"] != nil
+        failsSecondTrendingPageOnce = processEnvironment["MOVIESCOPE_FIXTURES_FAIL_PAGE_2"] == "1"
         logLevel = processEnvironment["MOVIESCOPE_LOG_LEVEL"] ?? "info"
     }
 }

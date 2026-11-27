@@ -15,21 +15,25 @@ public actor ImageConfigurationStore {
     private let service: any TMDBService
     private let fileURL: URL
     private let maxAge: TimeInterval
+    private let retryInterval: TimeInterval
     private let now: @Sendable () -> Date
 
     private var cached: Stored?
     private var didLoadFromDisk = false
     private var inFlight: Task<ImageConfiguration, Never>?
+    private var lastFailure: Date?
 
     public init(
         service: any TMDBService,
         fileURL: URL,
         maxAge: TimeInterval = 7 * 24 * 3600,
+        retryInterval: TimeInterval = 60,
         now: @escaping @Sendable () -> Date = { Date() }
     ) {
         self.service = service
         self.fileURL = fileURL
         self.maxAge = maxAge
+        self.retryInterval = retryInterval
         self.now = now
     }
 
@@ -37,6 +41,10 @@ public actor ImageConfigurationStore {
         loadFromDiskIfNeeded()
         if let cached, now().timeIntervalSince(cached.fetchedAt) < maxAge {
             return cached.configuration
+        }
+        if let lastFailure, now().timeIntervalSince(lastFailure) < retryInterval {
+            // Recently failed (e.g. offline): don't make every image wait on another attempt.
+            return cached?.configuration ?? .fallback
         }
         if let inFlight {
             return await inFlight.value
@@ -53,6 +61,7 @@ public actor ImageConfigurationStore {
             let configuration = try await service.imageConfiguration()
             let stored = Stored(configuration: configuration, fetchedAt: now())
             cached = stored
+            lastFailure = nil
             do {
                 try Self.persist(stored.configuration, fetchedAt: stored.fetchedAt, to: fileURL)
             } catch {
@@ -61,6 +70,7 @@ public actor ImageConfigurationStore {
             return configuration
         } catch {
             Log.network.error("Image configuration fetch failed: \(String(describing: error))")
+            lastFailure = now()
             return cached?.configuration ?? .fallback
         }
     }

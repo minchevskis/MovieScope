@@ -162,11 +162,16 @@ final class TrendingViewController: UIViewController {
     }
 
     private func updateFooters() {
-        for case let footer as LoadingFooterView in collectionView.visibleSupplementaryViews(
-            ofKind: UICollectionView.elementKindSectionFooter
-        ) {
+        let kind = UICollectionView.elementKindSectionFooter
+        for case let footer as LoadingFooterView in collectionView.visibleSupplementaryViews(ofKind: kind) {
             footer.configure(phase: phase) { [weak self] in self?.onRetry() }
         }
+        // The footer's content changed height (spinner ↔ message + button): re-measure it.
+        let indexPaths = collectionView.indexPathsForVisibleSupplementaryElements(ofKind: kind)
+        guard !indexPaths.isEmpty else { return }
+        let context = UICollectionViewLayoutInvalidationContext()
+        context.invalidateSupplementaryElements(ofKind: kind, at: indexPaths)
+        collectionView.collectionViewLayout.invalidateLayout(with: context)
     }
 
     /// Poster size of a grid cell at the current width; prefetches must use

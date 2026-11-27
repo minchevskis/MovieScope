@@ -41,6 +41,7 @@ nonisolated enum AccessibilityID {
         static let idle = "search.idle"
         static let empty = "search.empty"
         static let list = "search.list"
+        static let retryNextPage = "search.retryNextPage"
 
         static func row(_ index: Int) -> String { "search.row.\(index)" }
     }

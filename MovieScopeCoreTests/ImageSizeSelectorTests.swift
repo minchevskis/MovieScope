@@ -45,4 +45,25 @@ final class ImageSizeSelectorTests: XCTestCase {
 
         XCTAssertEqual(ImageConfiguration.fallback, live)
     }
+
+    func test_coveringSize_squareViewWithPortraitImage_growsHeight() {
+        let size = ImageSizeSelector.coveringSize(for: CGSize(width: 76, height: 76), aspectRatio: 2.0 / 3.0)
+
+        XCTAssertEqual(size.width, 76, accuracy: 0.01)
+        XCTAssertEqual(size.height, 114, accuracy: 0.01)
+    }
+
+    func test_coveringSize_shortWideViewWithBackdrop_growsWidth() {
+        let size = ImageSizeSelector.coveringSize(for: CGSize(width: 338, height: 220), aspectRatio: 16.0 / 9.0)
+
+        XCTAssertEqual(size.width, 391.11, accuracy: 0.01)
+        XCTAssertEqual(size.height, 220, accuracy: 0.01)
+    }
+
+    func test_coveringSize_matchingAspect_isUnchanged() {
+        let size = ImageSizeSelector.coveringSize(for: CGSize(width: 100, height: 150), aspectRatio: ImageCategory.poster.aspectRatio)
+
+        XCTAssertEqual(size.width, 100, accuracy: 0.01)
+        XCTAssertEqual(size.height, 150, accuracy: 0.01)
+    }
 }

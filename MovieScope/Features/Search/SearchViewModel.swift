@@ -19,6 +19,14 @@ final class SearchViewModel {
         case failed(String)
     }
 
+    /// The row after the results: a spinner while the next page loads, or an
+    /// error with a retry when it failed.
+    enum Footer: Equatable {
+        case none
+        case loading
+        case failed(String)
+    }
+
     static let minimumQueryLength = 2
 
     var query = "" {
@@ -38,6 +46,7 @@ final class SearchViewModel {
     }
 
     private(set) var activeQuery: String?
+    @ObservationIgnored private var activeKind: MediaKind?
 
     @ObservationIgnored private let service: any TMDBService
     @ObservationIgnored private let pagination: PaginationController<MediaSummary>
@@ -70,6 +79,17 @@ final class SearchViewModel {
         }
     }
 
+    var footer: Footer {
+        guard !items.isEmpty else { return .none }
+        switch pagination.phase {
+        case .loadingNextPage: return .loading
+        case let .failed(error): return .failed(error.userMessage)
+        default: return .none
+        }
+    }
+
+    var isThrottleWindowOpen: Bool { throttler?.isWindowOpen ?? false }
+
     func itemDisplayed(at index: Int) async {
         guard index >= items.count - TrendingViewModel.nextPageThreshold else { return }
         await pagination.loadNextPage()
@@ -82,18 +102,22 @@ final class SearchViewModel {
     /// Starts a new search (or clears results for a too-short query).
     private func search(_ text: String) {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        searchTask?.cancel()
         guard trimmed.count >= Self.minimumQueryLength else {
             activeQuery = nil
+            activeKind = nil
             pagination.reset { _ in Page(page: 1, totalPages: 0, items: []) }
             return
         }
-        activeQuery = trimmed
         let kind = scope
+        // "star" → "star " is the same search: keep the results instead of reloading them.
+        guard trimmed != activeQuery || kind != activeKind else { return }
+        activeQuery = trimmed
+        activeKind = kind
         let service = service
         pagination.reset { page in
             try await service.search(kind, query: trimmed, page: page)
         }
+        searchTask?.cancel()
         searchTask = Task { await pagination.loadFirstPage() }
     }
 }

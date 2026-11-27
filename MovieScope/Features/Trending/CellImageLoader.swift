@@ -1,6 +1,14 @@
 import MovieScopeCore
 import UIKit
 
+/// What a cell needs to load an image; `ImageProvider` is the live implementation.
+@MainActor
+protocol ImageLoading: AnyObject {
+    func image(path: String?, category: ImageCategory, pointSize: CGSize, scale: CGFloat) async throws -> UIImage?
+}
+
+extension ImageProvider: ImageLoading {}
+
 /// Loads a TMDB image into a reusable cell's image view at the view's rendered
 /// size, protecting against the classic reuse bug: a slow image for a previous
 /// item landing in a cell that now shows a different item.
@@ -22,7 +30,7 @@ final class CellImageLoader {
         path: String?,
         category: ImageCategory,
         into imageView: UIImageView,
-        provider: ImageProvider?,
+        provider: (any ImageLoading)?,
         scale: CGFloat
     ) {
         let size = CGSize(width: imageView.bounds.width.rounded(), height: imageView.bounds.height.rounded())

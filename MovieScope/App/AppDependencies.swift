@@ -21,17 +21,24 @@ final class AppDependencies {
         let apiTransport: any HTTPTransport
         let imageTransport: any HTTPTransport
         if environment.usesFixtures {
-            let fixtures = FixtureTransport(bundle: bundle)
+            let fixtures = FixtureTransport(
+                bundle: bundle,
+                failingOnce: environment.failsSecondTrendingPageOnce ? ["/3/trending/movie/week?page=2"] : []
+            )
             credentials = StaticCredentialProvider(environment.forcesMissingToken ? nil : "fixture-token")
             apiTransport = fixtures
             imageTransport = fixtures
         } else {
             credentials = environment.forcesMissingToken ? StaticCredentialProvider(nil) : Self.liveCredentials(bundle)
-            apiTransport = URLSessionTransport()
+            apiTransport = URLSessionTransport(session: .api)
             imageTransport = URLSessionTransport(session: .images)
         }
 
-        let client = TMDBClient(transport: apiTransport, credentials: credentials)
+        let client = TMDBClient(
+            transport: apiTransport,
+            credentials: credentials,
+            logsRequests: environment.logLevel == "debug"
+        )
         service = client
         hasCredentials = credentials.accessToken() != nil
         favorites = FavoritesModel(

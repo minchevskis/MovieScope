@@ -19,6 +19,15 @@ public struct URLSessionTransport: HTTPTransport {
 }
 
 extension URLSession {
+    /// Session for API calls. No response cache: search queries must not be
+    /// persisted on disk, and a refresh must always hit the network.
+    public static let api: URLSession = {
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.urlCache = nil
+        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+        return URLSession(configuration: configuration)
+    }()
+
     /// Session for image downloads with its own `URLCache` (20 MB memory, 200 MB disk).
     /// TMDB's image CDN sends long-lived `Cache-Control` headers, so this cache
     /// serves repeat images without hitting the network.

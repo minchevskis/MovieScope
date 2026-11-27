@@ -167,6 +167,39 @@ final class SearchViewModelTests: XCTestCase {
         XCTAssertTrue(sut.items.isEmpty)
     }
 
+    func test_nextPageFailure_showsFooterError_andRetryLoadsIt() async {
+        await service.setSearch(.movie, query: "star", .success(stubPage(1, of: 2, ids: 0..<10)))
+        await service.setSearch(.movie, query: "star", page: 2, .failure(APIError.transport(.timedOut)))
+        let sut = makeSUT()
+        sut.query = "star"
+        await waitUntil { sut.state == .results }
+
+        await sut.itemDisplayed(at: 9)
+        XCTAssertEqual(sut.footer, .failed("TMDB couldn't be reached. Please try again."))
+
+        await service.setSearch(.movie, query: "star", page: 2, .success(stubPage(2, of: 2, ids: 10..<20)))
+        await sut.retry()
+        XCTAssertEqual(sut.footer, .none)
+        XCTAssertEqual(sut.items.count, 20)
+    }
+
+    func test_trailingWhitespace_doesNotRerunSameSearch() async {
+        await service.setSearch(.movie, query: "star", .success(stubPage(1, of: 1, ids: 0..<3)))
+        let sut = makeSUT()
+        sut.query = "star"
+        await waitUntil { sut.state == .results }
+        await sleeper.waitForSleepers(1)
+        await sleeper.advance()
+        await waitUntil { !sut.isThrottleWindowOpen }
+
+        sut.query = "star "
+        await Task.yield()
+
+        let calls = await service.searchCalls.count
+        XCTAssertEqual(calls, 1, "Typing a space before the next word must not search again")
+        XCTAssertEqual(sut.state, .results)
+    }
+
     // MARK: - Helpers
 
     private func makeSUT() -> SearchViewModel {

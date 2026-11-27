@@ -6,10 +6,27 @@ public enum ImageCategory: Sendable {
     case poster
     case backdrop
     case profile
+
+    /// Width ÷ height of TMDB images in this category.
+    public var aspectRatio: CGFloat {
+        switch self {
+        case .poster, .profile: 2.0 / 3.0
+        case .backdrop: 16.0 / 9.0
+        }
+    }
 }
 
 /// Picks the TMDB size token for an image rendered at a given pixel width.
 public enum ImageSizeSelector {
+    /// The size an image of `aspectRatio` must have to completely cover a view
+    /// of `viewSize` with aspect-fill (e.g. a 2:3 portrait in a square circle
+    /// must be taller than the view, or it is upscaled and looks soft).
+    public static func coveringSize(for viewSize: CGSize, aspectRatio: CGFloat) -> CGSize {
+        guard aspectRatio > 0 else { return viewSize }
+        let width = max(viewSize.width, viewSize.height * aspectRatio)
+        return CGSize(width: width, height: width / aspectRatio)
+    }
+
     /// Returns the smallest width token (`"wNNN"`) at least `pixelWidth` wide.
     /// Falls back to the largest width token when none is wide enough, and to
     /// `"original"` when the list has no width tokens at all.

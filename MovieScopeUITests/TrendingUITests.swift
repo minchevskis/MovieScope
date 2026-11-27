@@ -38,3 +38,24 @@ final class TrendingUITests: XCTestCase {
         attachScreenshot(of: app, named: "trending-landscape")
     }
 }
+
+@MainActor
+final class TrendingPagingFailureUITests: XCTestCase {
+    func test_nextPageFailure_showsRetryInFooter_andRetryLoadsThePage() {
+        let app = XCUIApplication()
+        app.launchEnvironment["MOVIESCOPE_FIXTURES"] = "1"
+        app.launchEnvironment["MOVIESCOPE_RESET_STATE"] = "1"
+        app.launchEnvironment["MOVIESCOPE_FIXTURES_FAIL_PAGE_2"] = "1"
+        app.launch()
+        let collection = app.collectionViews[AccessibilityID.Trending.collection]
+        collection.waitToAppear()
+
+        let retry = app.buttons[AccessibilityID.Trending.retryNextPage]
+        XCTAssertTrue(app.scroll(collection, toReveal: retry), "The footer offers Try Again when page 2 fails")
+        attachScreenshot(of: app, named: "trending-next-page-error")
+        retry.tap()
+
+        let secondPageItem = app.cells[AccessibilityID.Trending.item(8)]
+        XCTAssertTrue(app.scroll(collection, toReveal: secondPageItem), "Retry loads page 2")
+    }
+}

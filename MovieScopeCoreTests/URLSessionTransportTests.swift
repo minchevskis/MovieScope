@@ -40,4 +40,11 @@ final class URLSessionTransportTests: XCTestCase {
         XCTAssertEqual(cache.diskCapacity, 200 * 1024 * 1024)
         XCTAssertFalse(cache === URLCache.shared)
     }
+
+    func test_apiSession_doesNotPersistResponses() {
+        let configuration = URLSession.api.configuration
+
+        XCTAssertNil(configuration.urlCache, "Search queries must not end up in an on-disk cache")
+        XCTAssertEqual(configuration.requestCachePolicy, .reloadIgnoringLocalCacheData)
+    }
 }

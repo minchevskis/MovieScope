@@ -147,3 +147,23 @@ The full context is in `DESIGN.md`.
 - **Reason:** Shows the recorder in use, and the history makes the
   recorded-versus-edited difference visible, while the test stays stable
   across iOS 18, iOS 26 and iPad.
+
+## 2026-11-27: Fixes from the whole-project review
+- **Decision:** An independent review found no critical issues. These were
+  fixed, each with a test that failed first:
+  - a failed pull-to-refresh retries as a refresh
+  - Search shows next-page errors with a retry
+  - stale-search tests prove the generation guard, not only cancellation
+  - images cover their views
+  - cast is de-duplicated per person
+  - API responses get an ephemeral, cache-less session
+  - `/configuration` backs off after a failure
+  - a trailing space doesn't re-run a search
+  - the reused-cell image protection is unit-tested
+  - the Trending footer re-measures when it changes
+  - Dev request logging with header redaction is real
+- **Alternatives:** Shipping as reviewed.
+- **Reason:** The fixes were small and contained, and each was a case a
+  user or reviewer could plausibly hit. The remaining minor items are listed
+  in the build notes.
+

@@ -44,7 +44,7 @@ final class ThrottlerTests: XCTestCase {
         sut.send("a")
         await sleeper.waitForSleepers(1)
         await sleeper.advance()
-        await waitUntil { await sleeper.pendingCount == 0 }
+        await waitUntil { !sut.isWindowOpen }
 
         sut.send("b")
 

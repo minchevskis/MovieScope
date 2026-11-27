@@ -85,9 +85,36 @@ struct SearchScreen<Destination: View>: View {
                     Task { await viewModel.itemDisplayed(at: index) }
                 }
             }
+            footerRow
         }
         .listStyle(.plain)
         .accessibilityIdentifier(AccessibilityID.Search.list)
+    }
+}
+
+extension SearchScreen {
+    @ViewBuilder
+    fileprivate var footerRow: some View {
+        switch viewModel.footer {
+        case .none:
+            EmptyView()
+        case .loading:
+            ProgressView()
+                .frame(maxWidth: .infinity)
+                .listRowSeparator(.hidden)
+        case let .failed(message):
+            VStack(spacing: 8) {
+                Text(message)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                Button("Try Again") { Task { await viewModel.retry() } }
+                    .buttonStyle(.bordered)
+                    .accessibilityIdentifier(AccessibilityID.Search.retryNextPage)
+            }
+            .frame(maxWidth: .infinity)
+            .listRowSeparator(.hidden)
+        }
     }
 }
 

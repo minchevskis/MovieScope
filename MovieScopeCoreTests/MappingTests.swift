@@ -116,4 +116,19 @@ final class MappingTests: XCTestCase {
         XCTAssertEqual(details.reviews.count, 3)
         XCTAssertTrue(details.directors.isEmpty)
     }
+
+    func test_map_castDeduplicatesPeople_joiningCharacters() throws {
+        let credits = try FixtureLoader.decode(CreditsDTO.self, json: """
+        {"cast": [
+          {"id": 1, "name": "Peter", "character": "Mandrake", "order": 0},
+          {"id": 2, "name": "George", "character": "Turgidson", "order": 1},
+          {"id": 1, "name": "Peter", "character": "Muffley", "order": 2}
+        ], "crew": []}
+        """)
+
+        let cast = credits.cast(limit: 15)
+
+        XCTAssertEqual(cast.map(\.person.id), [1, 2], "Each person appears once (unique SwiftUI identity)")
+        XCTAssertEqual(cast.first?.character, "Mandrake / Muffley")
+    }
 }

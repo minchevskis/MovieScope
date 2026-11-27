@@ -68,11 +68,14 @@ final class ImageProvider {
         pointSize: CGSize,
         scale: CGFloat
     ) async -> ImageRequest? {
-        let pixelWidth = pointSize.width * scale
-        guard pixelWidth > 0 else { return nil }
+        guard pointSize.width > 0, pointSize.height > 0 else { return nil }
+        // Aspect-fill: the image must cover the whole view, not just fit its longest side.
+        let covering = ImageSizeSelector.coveringSize(for: pointSize, aspectRatio: category.aspectRatio)
         let configuration = await configurationStore.current()
-        guard let url = configuration.url(for: path, category: category, pixelWidth: pixelWidth) else { return nil }
-        let maxPixelSize = Int((max(pointSize.width, pointSize.height) * scale).rounded(.up))
+        guard let url = configuration.url(for: path, category: category, pixelWidth: covering.width * scale) else {
+            return nil
+        }
+        let maxPixelSize = Int((max(covering.width, covering.height) * scale).rounded(.up))
         return ImageRequest(url: url, maxPixelSize: maxPixelSize)
     }
 }

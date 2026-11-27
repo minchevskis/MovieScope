@@ -67,7 +67,8 @@ actor FakeTMDBService: TMDBService {
         if holdsResponses {
             await withCheckedContinuation { held[key] = $0 }
         }
-        try Task.checkCancellation()
+        // Deliberately ignores cancellation: a stale response still arrives, so
+        // tests prove the generation guard drops it (not just Task cancellation).
         return try (searchResults[key] ?? .success(Page(page: page, totalPages: 1, items: []))).get()
     }
 

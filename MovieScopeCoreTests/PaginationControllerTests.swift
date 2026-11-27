@@ -121,6 +121,32 @@ final class PaginationControllerTests: XCTestCase {
         XCTAssertEqual(sut.phase, .loaded)
     }
 
+    func test_retryAfterFailedRefresh_replacesItemsInsteadOfAppending() async {
+        let fetcher = ControlledFetcher()
+        let sut = await loadedSUT(fetcher, firstPage: testPage(1, of: 3, ids: [1, 2]))
+        async let next: Void = sut.loadNextPage()
+        await fetcher.waitForRequests(2)
+        await fetcher.resolve(2, with: .success(testPage(2, of: 3, ids: [3, 4])))
+        await next
+
+        async let refresh: Void = sut.refresh()
+        await fetcher.waitForRequests(3)
+        await fetcher.resolve(1, with: .failure(APIError.transport(.notConnectedToInternet)))
+        await refresh
+        async let retry: Void = sut.retry()
+        await fetcher.waitForRequests(4)
+        await fetcher.resolve(1, with: .success(testPage(1, of: 3, ids: [9, 10])))
+        await retry
+
+        XCTAssertEqual(sut.items.map(\.id), [9, 10], "A retried refresh replaces the list")
+        async let afterRetry: Void = sut.loadNextPage()
+        await fetcher.waitForRequests(5)
+        let pages = await fetcher.requestedPages
+        XCTAssertEqual(pages.last, 2, "Paging restarts after page 1")
+        await fetcher.resolve(2, with: .success(testPage(2, of: 3, ids: [11])))
+        await afterRetry
+    }
+
     func test_nonAPIError_mapsToUnknownTransportFailure() async {
         struct Boom: Error {}
         let fetcher = ControlledFetcher()
