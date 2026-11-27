@@ -75,14 +75,46 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		A10000000000000000008001 /* Fixtures */ = {isa = PBXFileSystemSynchronizedRootGroup; path = Fixtures; sourceTree = "<group>"; };
-		A10000000000000000008002 /* SharedIdentifiers */ = {isa = PBXFileSystemSynchronizedRootGroup; path = SharedIdentifiers; sourceTree = "<group>"; };
-		A10000000000000000008003 /* TestSupport */ = {isa = PBXFileSystemSynchronizedRootGroup; path = TestSupport; sourceTree = "<group>"; };
-		A10000000000000000009009 /* MovieScopeUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; path = MovieScopeUITests; sourceTree = "<group>"; };
-		A1000000000000000000B009 /* MovieScopeTests */ = {isa = PBXFileSystemSynchronizedRootGroup; path = MovieScopeTests; sourceTree = "<group>"; };
-		A1000000000000000000C009 /* MovieScopeCore */ = {isa = PBXFileSystemSynchronizedRootGroup; path = MovieScopeCore; sourceTree = "<group>"; };
-		A1000000000000000000D009 /* MovieScopeCoreTests */ = {isa = PBXFileSystemSynchronizedRootGroup; path = MovieScopeCoreTests; sourceTree = "<group>"; };
-		A1000000000000000000E009 /* MovieScope */ = {isa = PBXFileSystemSynchronizedRootGroup; path = MovieScope; sourceTree = "<group>"; };
+		A10000000000000000008001 /* Fixtures */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Fixtures;
+			sourceTree = "<group>";
+		};
+		A10000000000000000008002 /* SharedIdentifiers */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = SharedIdentifiers;
+			sourceTree = "<group>";
+		};
+		A10000000000000000008003 /* TestSupport */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = TestSupport;
+			sourceTree = "<group>";
+		};
+		A10000000000000000009009 /* MovieScopeUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = MovieScopeUITests;
+			sourceTree = "<group>";
+		};
+		A1000000000000000000B009 /* MovieScopeTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = MovieScopeTests;
+			sourceTree = "<group>";
+		};
+		A1000000000000000000C009 /* MovieScopeCore */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = MovieScopeCore;
+			sourceTree = "<group>";
+		};
+		A1000000000000000000D009 /* MovieScopeCoreTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = MovieScopeCoreTests;
+			sourceTree = "<group>";
+		};
+		A1000000000000000000E009 /* MovieScope */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = MovieScope;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -195,8 +227,8 @@
 				A1000000000000000000900A /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				A10000000000000000009009 /* MovieScopeUITests */,
 				A10000000000000000008002 /* SharedIdentifiers */,
+				A10000000000000000009009 /* MovieScopeUITests */,
 			);
 			name = MovieScopeUITests;
 			packageProductDependencies = (
@@ -219,8 +251,8 @@
 				A1000000000000000000B00A /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				A1000000000000000000B009 /* MovieScopeTests */,
 				A10000000000000000008003 /* TestSupport */,
+				A1000000000000000000B009 /* MovieScopeTests */,
 			);
 			name = MovieScopeTests;
 			packageProductDependencies = (
@@ -266,9 +298,9 @@
 				A1000000000000000000D00A /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				A1000000000000000000D009 /* MovieScopeCoreTests */,
 				A10000000000000000008001 /* Fixtures */,
 				A10000000000000000008003 /* TestSupport */,
+				A1000000000000000000D009 /* MovieScopeCoreTests */,
 			);
 			name = MovieScopeCoreTests;
 			packageProductDependencies = (
@@ -293,9 +325,9 @@
 				A1000000000000000000E00F /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				A1000000000000000000E009 /* MovieScope */,
 				A10000000000000000008001 /* Fixtures */,
 				A10000000000000000008002 /* SharedIdentifiers */,
+				A1000000000000000000E009 /* MovieScope */,
 			);
 			name = MovieScope;
 			packageProductDependencies = (
@@ -448,7 +480,7 @@
 		};
 		A1000000000000000000C00A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = A1000000000000000000C00B /* plugin:SwiftLintBuildToolPlugin */;
+			productRef = A1000000000000000000C00B /* SwiftLintBuildToolPlugin */;
 		};
 		A1000000000000000000D00A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -462,22 +494,82 @@
 		};
 		A1000000000000000000E00F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = A1000000000000000000E010 /* plugin:SwiftLintBuildToolPlugin */;
+			productRef = A1000000000000000000E010 /* SwiftLintBuildToolPlugin */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		A1000000000000000000F005 /* Dev */ = {
+		A10000000000000000009004 /* Dev */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A1000000000000000000F00A /* Dev.xcconfig */;
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.minchevskis.MovieScopeUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = NO;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = MovieScope;
 			};
 			name = Dev;
 		};
-		A1000000000000000000F006 /* Prod */ = {
+		A10000000000000000009005 /* Prod */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A1000000000000000000F00B /* Prod.xcconfig */;
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.minchevskis.MovieScopeUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = NO;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = MovieScope;
+			};
+			name = Prod;
+		};
+		A1000000000000000000B004 /* Dev */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.minchevskis.MovieScopeTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = NO;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MovieScope.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MovieScope";
+			};
+			name = Dev;
+		};
+		A1000000000000000000B005 /* Prod */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.minchevskis.MovieScopeTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = NO;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MovieScope.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MovieScope";
 			};
 			name = Prod;
 		};
@@ -658,77 +750,17 @@
 			};
 			name = Prod;
 		};
-		A1000000000000000000B004 /* Dev */ = {
+		A1000000000000000000F005 /* Dev */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = A1000000000000000000F00A /* Dev.xcconfig */;
 			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.github.minchevskis.MovieScopeTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SWIFT_APPROACHABLE_CONCURRENCY = NO;
-				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MovieScope.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MovieScope";
 			};
 			name = Dev;
 		};
-		A1000000000000000000B005 /* Prod */ = {
+		A1000000000000000000F006 /* Prod */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = A1000000000000000000F00B /* Prod.xcconfig */;
 			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.github.minchevskis.MovieScopeTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SWIFT_APPROACHABLE_CONCURRENCY = NO;
-				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MovieScope.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MovieScope";
-			};
-			name = Prod;
-		};
-		A10000000000000000009004 /* Dev */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.github.minchevskis.MovieScopeUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SWIFT_APPROACHABLE_CONCURRENCY = NO;
-				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = MovieScope;
-			};
-			name = Dev;
-		};
-		A10000000000000000009005 /* Prod */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.github.minchevskis.MovieScopeUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SWIFT_APPROACHABLE_CONCURRENCY = NO;
-				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = MovieScope;
 			};
 			name = Prod;
 		};
@@ -803,12 +835,12 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		A1000000000000000000C00B /* plugin:SwiftLintBuildToolPlugin */ = {
+		A1000000000000000000C00B /* SwiftLintBuildToolPlugin */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = A1000000000000000000F007 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */;
 			productName = "plugin:SwiftLintBuildToolPlugin";
 		};
-		A1000000000000000000E010 /* plugin:SwiftLintBuildToolPlugin */ = {
+		A1000000000000000000E010 /* SwiftLintBuildToolPlugin */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = A1000000000000000000F007 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */;
 			productName = "plugin:SwiftLintBuildToolPlugin";
