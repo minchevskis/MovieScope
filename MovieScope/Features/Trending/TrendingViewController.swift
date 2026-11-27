@@ -172,7 +172,10 @@ final class TrendingViewController: UIViewController {
     /// Poster size of a grid cell at the current width; prefetches must use
     /// the same size the cells render at, so they hit the same cache entries.
     private var gridPosterSize: CGSize {
-        let width = TrendingLayout.gridItemWidth(containerWidth: collectionView.bounds.width)
+        let width = TrendingLayout.gridItemWidth(
+            containerWidth: collectionView.bounds.width,
+            minimumItemWidth: TrendingLayout.minimumItemWidth(for: traitCollection)
+        )
         return CGSize(width: width.rounded(), height: (width * 1.5).rounded())
     }
 

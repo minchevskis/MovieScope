@@ -11,6 +11,7 @@ final class SectionHeaderView: UICollectionReusableView {
         super.init(frame: frame)
         label.font = .preferredFont(forTextStyle: .title2).withTraits(.traitBold)
         label.adjustsFontForContentSizeCategory = true
+        label.numberOfLines = 0
         label.accessibilityTraits = .header
         label.translatesAutoresizingMaskIntoConstraints = false
         addSubview(label)

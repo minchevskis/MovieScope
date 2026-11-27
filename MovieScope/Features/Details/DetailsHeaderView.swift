@@ -8,6 +8,7 @@ struct DetailsHeaderView: View {
     let details: MediaDetails?
 
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -23,6 +24,12 @@ struct DetailsHeaderView: View {
                 if horizontalSizeClass == .regular {
                     HStack(alignment: .top, spacing: 20) {
                         poster.frame(width: 160)
+                        titleBlock
+                    }
+                } else if dynamicTypeSize.isAccessibilitySize {
+                    // Very large text: stack, so the title doesn't push the poster off screen.
+                    VStack(alignment: .leading, spacing: 16) {
+                        poster.frame(width: 140)
                         titleBlock
                     }
                 } else {

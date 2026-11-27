@@ -16,6 +16,8 @@ enum TrendingSection: Int, Sendable, CaseIterable {
 ///   self-size, so Dynamic Type works.
 enum TrendingLayout {
     nonisolated static let minimumItemWidth: CGFloat = 160
+    /// Wider cards at accessibility text sizes (one column on iPhone).
+    nonisolated static let accessibilityMinimumItemWidth: CGFloat = 300
     nonisolated static let spacing: CGFloat = 12
     nonisolated static let horizontalInset: CGFloat = 16
     nonisolated static let featuredHeight: CGFloat = 220
@@ -31,8 +33,11 @@ enum TrendingLayout {
     }
 
     /// The width of one grid card; the poster fills it (2:3).
-    nonisolated static func gridItemWidth(containerWidth: CGFloat) -> CGFloat {
-        let columns = CGFloat(columnCount(containerWidth: containerWidth))
+    nonisolated static func gridItemWidth(
+        containerWidth: CGFloat,
+        minimumItemWidth: CGFloat = minimumItemWidth
+    ) -> CGFloat {
+        let columns = CGFloat(columnCount(containerWidth: containerWidth, minimumItemWidth: minimumItemWidth))
         let available = containerWidth - horizontalInset * 2
         return (available - spacing * (columns - 1)) / columns
     }
@@ -69,7 +74,10 @@ enum TrendingLayout {
     }
 
     private static func gridSection(environment: any NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection {
-        let columns = columnCount(containerWidth: environment.container.effectiveContentSize.width)
+        let columns = columnCount(
+            containerWidth: environment.container.effectiveContentSize.width,
+            minimumItemWidth: minimumItemWidth(for: environment.traitCollection)
+        )
         let item = NSCollectionLayoutItem(layoutSize: .init(
             widthDimension: .fractionalWidth(1 / CGFloat(columns)),
             heightDimension: .estimated(320)
@@ -90,6 +98,10 @@ enum TrendingLayout {
         )
         section.boundarySupplementaryItems = [header(), footer]
         return section
+    }
+
+    static func minimumItemWidth(for traits: UITraitCollection) -> CGFloat {
+        traits.preferredContentSizeCategory.isAccessibilityCategory ? accessibilityMinimumItemWidth : minimumItemWidth
     }
 
     private static func header() -> NSCollectionLayoutBoundarySupplementaryItem {
