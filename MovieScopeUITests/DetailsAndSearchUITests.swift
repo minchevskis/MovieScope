@@ -72,6 +72,8 @@ final class SetupAndAboutUITests: XCTestCase {
         let attribution = app.staticTexts[AccessibilityID.About.attribution]
         attribution.waitToAppear()
         XCTAssertTrue(attribution.label.contains("not endorsed, certified, or otherwise approved by TMDB"))
+        XCTAssertTrue(app.images["The Movie Database logo"].exists, "The official TMDB logo asset is shown")
+        attachScreenshot(of: app, named: "about")
     }
 }
 
