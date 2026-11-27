@@ -91,3 +91,59 @@ The full context is in `DESIGN.md`.
 - **Reason:** Xcode 27 needs macOS 26.6+. Projects in Xcode 27.2's new
   `.xcproj` format only open in Xcode 27+. App Store uploads have required
   Xcode 26+ since April 2026.
+
+## 2026-11-27: Hand-authored project file with folder-synchronized groups
+- **Decision:** `MovieScope.xcodeproj` is hand-written in the Xcode 16+ format
+  (objectVersion 77). Each target maps to a folder that Xcode keeps in sync.
+  Xcode's own re-save is committed as-is.
+- **Alternatives:** XcodeGen or Tuist; creating the project in the Xcode UI.
+- **Reason:** Adding a source file needs no project-file edit, and the
+  repository needs no generator tool. A re-save by Xcode 26.6 only reformatted
+  the file; the parsed contents are identical.
+
+## 2026-11-27: Fixtures captured from the live API
+- **Decision:** `Scripts/capture-fixtures.sh` captures trimmed TMDB responses
+  into `Fixtures/`. Unit tests decode them. UI tests run the app on them through
+  `FixtureTransport`, with artwork generated in code.
+- **Alternatives:** Hand-written JSON; UI tests against the live API.
+- **Reason:** Decoding is checked against real payloads. UI tests are
+  deterministic and need no network or token.
+
+## 2026-11-27: One error normaliser
+- **Decision:** `APIError.init(_:)` maps any thrown error (URL errors,
+  cancellation, unknown errors) to `APIError`. The client and the pagination
+  controller both use it. Cancellation never surfaces as a user-facing error.
+- **Alternatives:** Mapping errors separately in each layer.
+- **Reason:** Error states and messages behave the same everywhere.
+
+## 2026-11-27: Search field placement on iPad
+- **Decision:** In regular width, the search field and its Movies/TV scope are
+  pinned under the navigation bar, and the Search tab presents search on
+  appear. iPhone keeps the system bottom field (iOS 26).
+- **Alternatives:** The iPadOS 26 default (search collapsed into a toolbar button).
+- **Reason:** The brief asks for the kind to be chosen in advance. The scope
+  should be visible as soon as the Search tab opens.
+
+## 2026-11-27: Layout at accessibility text sizes
+- **Decision:** At accessibility content sizes, the Trending grid uses a
+  300 pt minimum card width (one column on iPhone), section headers wrap, and
+  the details header stacks the poster above the title. Prefetching follows the
+  same widths.
+- **Alternatives:** Letting text truncate.
+- **Reason:** Found by a UI test rendering the screens at AX-XXXL.
+
+## 2026-11-27: Low-resolution preview from the memory cache
+- **Decision:** The details poster and backdrop first show any variant of the
+  same TMDB file already decoded in memory (for example the grid poster), then
+  cross-fade to the full size.
+- **Alternatives:** Requesting a tiny size first (an extra request per image).
+- **Reason:** An instant preview with no extra network traffic.
+
+## 2026-11-27: Recorded UI test
+- **Decision:** A flow recorded with Xcode 26's UI recorder is committed raw
+  first, then hardened in a second commit: identifier queries, incidental
+  gestures removed, iOS 18-compatible navigation, assertions after each step.
+- **Alternatives:** Keeping the raw recording; writing the flow by hand.
+- **Reason:** Shows the recorder in use, and the history makes the
+  recorded-versus-edited difference visible, while the test stays stable
+  across iOS 18, iOS 26 and iPad.
