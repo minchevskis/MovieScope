@@ -3,10 +3,9 @@
 # build-xcframework.sh: builds MovieScopeCore into a multi-platform XCFramework
 # (one slice per platform).
 #
-# Adapted from a generic XCFramework build script for this project's framework target:
-#   - explicit project, Prod configuration by default
-#   - output named after the module
-#   - all Apple platforms the core supports by default
+#   - builds the framework target with the Prod configuration by default
+#   - covers every Apple platform the core supports by default
+#   - fails if a requested slice is missing (no partial XCFrameworks)
 #   - fails unless every slice ships a .swiftinterface (module stability), so
 #     the result is importable by newer Swift compilers
 #
