@@ -1,0 +1,17 @@
+# Xcode
+xcuserdata/
+DerivedData/
+build/
+*.xcresult
+
+# Build artifacts
+Artifacts/
+
+# Secrets (copy Config/Secrets.example.xcconfig to Config/Secrets.xcconfig)
+Config/Secrets.xcconfig
+
+# Documents not part of the project
+*.pdf
+
+# macOS
+.DS_Store
