@@ -36,6 +36,14 @@ nonisolated enum AccessibilityID {
         static let facts = "details.facts"
     }
 
+    enum Search {
+        static let idle = "search.idle"
+        static let empty = "search.empty"
+        static let list = "search.list"
+
+        static func row(_ index: Int) -> String { "search.row.\(index)" }
+    }
+
     enum MissingToken {
         static let screen = "missingToken.screen"
     }

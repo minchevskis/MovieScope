@@ -23,8 +23,10 @@ struct RootView: View {
 
                 Tab("Search", systemImage: "magnifyingglass", role: .search) {
                     NavigationStack {
-                        ContentUnavailableView("Search", systemImage: "magnifyingglass")
-                            .aboutToolbar()
+                        SearchScreen(service: dependencies.service) { summary in
+                            DetailsScreen(id: summary.id, placeholder: summary, service: dependencies.service)
+                        }
+                        .aboutToolbar()
                     }
                 }
                 .accessibilityIdentifier(AccessibilityID.Root.searchTab)
