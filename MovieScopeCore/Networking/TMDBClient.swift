@@ -107,7 +107,7 @@ public struct TMDBClient: Sendable {
         do {
             return try await transport.data(for: request)
         } catch {
-            throw Self.map(error)
+            throw APIError(error)
         }
     }
 
@@ -115,20 +115,7 @@ public struct TMDBClient: Sendable {
         do {
             try await sleeper.sleep(for: duration)
         } catch {
-            throw Self.map(error)
-        }
-    }
-
-    static func map(_ error: any Error) -> APIError {
-        switch error {
-        case let apiError as APIError:
-            return apiError
-        case is CancellationError:
-            return .cancelled
-        case let urlError as URLError:
-            return urlError.code == .cancelled ? .cancelled : .transport(urlError.code)
-        default:
-            return .transport(.unknown)
+            throw APIError(error)
         }
     }
 }

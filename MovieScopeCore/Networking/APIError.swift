@@ -17,3 +17,19 @@ public enum APIError: Error, Equatable, Sendable {
     case invalidRequest
     case invalidResponse
 }
+
+extension APIError {
+    /// Normalizes any error thrown while loading into an `APIError`.
+    public init(_ error: any Error) {
+        switch error {
+        case let apiError as APIError:
+            self = apiError
+        case is CancellationError:
+            self = .cancelled
+        case let urlError as URLError:
+            self = urlError.code == .cancelled ? .cancelled : .transport(urlError.code)
+        default:
+            self = .transport(.unknown)
+        }
+    }
+}
