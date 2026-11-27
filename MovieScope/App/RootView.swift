@@ -14,7 +14,7 @@ struct RootView: View {
                             service: dependencies.service,
                             imageProvider: dependencies.imageProvider
                         ) { summary in
-                            Text(summary.title)
+                            DetailsScreen(id: summary.id, placeholder: summary, service: dependencies.service)
                         }
                         .aboutToolbar()
                     }

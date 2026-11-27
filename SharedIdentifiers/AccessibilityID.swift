@@ -26,6 +26,16 @@ nonisolated enum AccessibilityID {
         static func item(_ index: Int) -> String { "trending.item.\(index)" }
     }
 
+    enum Details {
+        static let screen = "details.screen"
+        static let rating = "details.rating"
+        static let overview = "details.overview"
+        static let people = "details.people"
+        static let cast = "details.cast"
+        static let reviews = "details.reviews"
+        static let facts = "details.facts"
+    }
+
     enum MissingToken {
         static let screen = "missingToken.screen"
     }
