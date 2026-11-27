@@ -1,0 +1,175 @@
+{
+  "page": 1,
+  "results": [
+    {
+      "adult": false,
+      "backdrop_path": "/rvtdN5XkWAfGX6xDuPL6yYS2seK.jpg",
+      "genre_ids": [
+        80,
+        9648,
+        53
+      ],
+      "id": 414906,
+      "original_language": "en",
+      "original_title": "The Batman",
+      "overview": "In his second year of fighting crime, Batman uncovers corruption in Gotham City that connects to his own family while facing a serial killer known as the Riddler.",
+      "popularity": 36.8722,
+      "poster_path": "/74xTEgt7R36Fpooo50r9T25onhq.jpg",
+      "release_date": "2022-03-01",
+      "softcore": false,
+      "title": "The Batman",
+      "video": false,
+      "vote_average": 7.675,
+      "vote_count": 12961
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/9IIBboV7MCT0bTxzXHmWK1Hq558.jpg",
+      "genre_ids": [
+        18,
+        80,
+        28
+      ],
+      "id": 272,
+      "original_language": "en",
+      "original_title": "Batman Begins",
+      "overview": "Driven by tragedy, billionaire Bruce Wayne dedicates his life to uncovering and defeating the corruption that plagues his home, Gotham City.  Unable to work within the system, he instead creates a new identity, a symbol of fear for the criminal underworld - The Batman.",
+      "popularity": 26.0395,
+      "poster_path": "/sPX89Td70IDDjVr85jdSBb4rWGr.jpg",
+      "release_date": "2005-06-10",
+      "softcore": false,
+      "title": "Batman Begins",
+      "video": false,
+      "vote_average": 7.733,
+      "vote_count": 23591
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/rhc7OF7tC9HPu0X8DBKQJzaGRbu.jpg",
+      "genre_ids": [
+        14,
+        28,
+        80
+      ],
+      "id": 268,
+      "original_language": "en",
+      "original_title": "Batman",
+      "overview": "Having witnessed his parents' brutal murder as a child, millionaire philanthropist Bruce Wayne fights crime in Gotham City disguised as Batman, a costumed hero who strikes fear into the hearts of villains. But when a deformed madman known as 'The Joker' seizes control of Gotham's criminal underworld, Batman must face his most ruthless nemesis ever while protecting both his identity and his love interest, reporter Vicki Vale.",
+      "popularity": 11.2967,
+      "poster_path": "/cij4dd21v2Rk2YtUQbV5kW69WB2.jpg",
+      "release_date": "1989-06-21",
+      "softcore": false,
+      "title": "Batman",
+      "video": false,
+      "vote_average": 7.235,
+      "vote_count": 8978
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/9vYIWoJ3EoD8UoCiZOCTszrkRVZ.jpg",
+      "genre_ids": [
+        28,
+        14
+      ],
+      "id": 364,
+      "original_language": "en",
+      "original_title": "Batman Returns",
+      "overview": "The monstrous Penguin, who dwells in the sewers beneath Gotham, joins up with corrupt mayoral candidate Max Shreck to topple the Batman once and for all. But when Shreck's timid assistant Selina Kyle finds out, and Shreck tries to kill her, she's transformed into the sexy Catwoman. She teams up with the Penguin and Shreck to destroy Batman, but sparks fly unexpectedly when she confronts the caped crusader.",
+      "popularity": 10.9068,
+      "poster_path": "/jKBjeXM7iBBV9UkUcOXx3m7FSHY.jpg",
+      "release_date": "1992-06-19",
+      "softcore": false,
+      "title": "Batman Returns",
+      "video": false,
+      "vote_average": 6.956,
+      "vote_count": 7444
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/kEuQWHte2erRpAICrYqkAZaZAAY.jpg",
+      "genre_ids": [
+        28,
+        878,
+        12
+      ],
+      "id": 415,
+      "original_language": "en",
+      "original_title": "Batman & Robin",
+      "overview": "Batman and his sidekick Robin attempt to the foil the sinister schemes of a deranged set of new villains, most notably the melancholy Mr. Freeze, who wants to make Gotham City into an arctic region, and the sultry Poison Ivy, a botanical femme fatale. As the Dynamic Duo contend with these bad guys, a third hero, Batgirl, joins the ranks of the city's crime-fighters.",
+      "popularity": 10.3274,
+      "poster_path": "/i7hEUpDuMN2LOrCEifFyGSHZQSY.jpg",
+      "release_date": "1997-06-20",
+      "softcore": false,
+      "title": "Batman & Robin",
+      "video": false,
+      "vote_average": 4.394,
+      "vote_count": 5666
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/caBIySpwuFi2i7ynvHIlnxJLOdN.jpg",
+      "genre_ids": [
+        16,
+        28,
+        12,
+        18
+      ],
+      "id": 1560520,
+      "original_language": "en",
+      "original_title": "Batman: Knightfall Part 1: Knightfall",
+      "overview": "Arkham Asylum has been destroyed, and all its inmates have been unleashed upon Gotham City. As Batman races to round up some of his greatest enemies, he is pushed to his physical and mental limits and into a final confrontation with a new threat: the man called Bane!",
+      "popularity": 25.041,
+      "poster_path": "/360qdtu2hLnqMu8SVHMywn420w1.jpg",
+      "release_date": "2026-08-25",
+      "softcore": false,
+      "title": "Batman: Knightfall Part 1: Knightfall",
+      "video": false,
+      "vote_average": 9.086,
+      "vote_count": 515
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/snlu32RmjldF9b068UURJg8sQtn.jpg",
+      "genre_ids": [
+        28,
+        80,
+        14
+      ],
+      "id": 414,
+      "original_language": "en",
+      "original_title": "Batman Forever",
+      "overview": "Batman faces off against two foes: the schizophrenic, horribly scarred former District Attorney Harvey Dent, aka Two-Face, and the Riddler, a disgruntled ex-Wayne Enterprises inventor seeking revenge against his former employer by unleashing his brain-sucking weapon on Gotham City's residents. As the caped crusader also copes with tortured memories of his parents' murder, he has a new romance, with psychologist Chase Meridian.",
+      "popularity": 7.3765,
+      "poster_path": "/i0fJS8M5UKoETjjJ0zwUiKaR8tr.jpg",
+      "release_date": "1995-06-16",
+      "softcore": false,
+      "title": "Batman Forever",
+      "video": false,
+      "vote_average": 5.462,
+      "vote_count": 5867
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/v6lvnMHYPMVhc0t08gKYJNpMijC.jpg",
+      "genre_ids": [
+        28,
+        35,
+        80
+      ],
+      "id": 2661,
+      "original_language": "en",
+      "original_title": "Batman",
+      "overview": "The Dynamic Duo faces four super-villains who plan to hold the world for ransom with the help of a secret invention that instantly dehydrates people.",
+      "popularity": 4.4036,
+      "poster_path": "/zzoPxWHnPa0eyfkMLgwbNvdEcVF.jpg",
+      "release_date": "1966-07-30",
+      "softcore": false,
+      "title": "Batman",
+      "video": false,
+      "vote_average": 6.379,
+      "vote_count": 1124
+    }
+  ],
+  "total_pages": 1,
+  "total_results": 8
+}

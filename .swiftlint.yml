@@ -54,6 +54,7 @@ identifier_name:
     - id
     - x
     - y
+    - tv
 
 custom_rules:
   no_print_in_core:

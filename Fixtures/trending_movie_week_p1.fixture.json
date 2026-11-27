@@ -1,0 +1,183 @@
+{
+  "page": 1,
+  "results": [
+    {
+      "adult": false,
+      "backdrop_path": "/rObL4of4eFA8yWaN9pRFo9aOVNi.jpg",
+      "genre_ids": [
+        878,
+        28,
+        12
+      ],
+      "id": 1003596,
+      "media_type": "movie",
+      "original_language": "en",
+      "original_title": "Avengers: Doomsday",
+      "overview": "Beloved heroes from three distinct universes are set on a deadly collision course and face an existential threat unlike anything they've ever encountered.",
+      "popularity": 263.0295,
+      "poster_path": "/1zqWkLwC1zLBBBtIWzmkmWeMWnT.jpg",
+      "release_date": "2026-12-16",
+      "softcore": false,
+      "title": "Avengers: Doomsday",
+      "video": false,
+      "vote_average": 0.0,
+      "vote_count": 0
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/aqFZcr2dxSZ2UwWSo1WC6C0rwDf.jpg",
+      "genre_ids": [
+        878,
+        28,
+        12
+      ],
+      "id": 1300968,
+      "media_type": "movie",
+      "original_language": "en",
+      "original_title": "The Hunger Games: Sunrise on the Reaping",
+      "overview": "Return to the world of Panem 24 years before Katniss Everdeen volunteers in her sister's place, commencing on the morning of the reaping of the 50th Hunger Games, also known as the Second Quarter Quell.",
+      "popularity": 342.5151,
+      "poster_path": "/5ffVOGY3x3Sn3jovzvycJeizpks.jpg",
+      "release_date": "2026-11-18",
+      "softcore": false,
+      "title": "The Hunger Games: Sunrise on the Reaping",
+      "video": false,
+      "vote_average": 7.8,
+      "vote_count": 381
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/3BBjkQmdGacKYZtpmK2vIfuDmON.jpg",
+      "genre_ids": [
+        28,
+        14
+      ],
+      "id": 1153576,
+      "media_type": "movie",
+      "original_language": "en",
+      "original_title": "Street Fighter",
+      "overview": "In 1993, estranged Street Fighters Ryu and Ken Masters are thrown back into combat when the mysterious Chun-Li recruits them for the next World Warrior Tournament: a brutal clash of fists, fate, and fury. But behind this battle royale lies a deadly conspiracy that forces them to face off against each other and the demons of their past. And if they don't, it's GAME OVER!",
+      "popularity": 51.4931,
+      "poster_path": "/dJPT2Uf12X6aFg8i5N67NTpIZ9t.jpg",
+      "release_date": "2026-10-13",
+      "softcore": false,
+      "title": "Street Fighter",
+      "video": false,
+      "vote_average": 6.2,
+      "vote_count": 275
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/c7btGYblBnfAaw713WvFM0Kimc7.jpg",
+      "genre_ids": [
+        12,
+        28,
+        14
+      ],
+      "id": 1368337,
+      "media_type": "movie",
+      "original_language": "en",
+      "original_title": "The Odyssey",
+      "overview": "Odysseus, the legendary King of Ithaca, embarks on a long and perilous journey home following the Trojan War. Throughout his voyage, he is forced to confront the whims of gods, mythological monsters, and trials that stretch both his cunning and his humanity to the breaking point.",
+      "popularity": 349.9557,
+      "poster_path": "/5rhTDKUhPYvpdQIijFIs5VoWsON.jpg",
+      "release_date": "2026-07-15",
+      "softcore": false,
+      "title": "The Odyssey",
+      "video": false,
+      "vote_average": 8.026,
+      "vote_count": 5527
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/r08LxMJCbf1SiJIWeyH9aJmdqwC.jpg",
+      "genre_ids": [
+        878,
+        28,
+        12
+      ],
+      "id": 969681,
+      "media_type": "movie",
+      "original_language": "en",
+      "original_title": "Spider-Man: Brand New Day",
+      "overview": "Fighting crime full-time as Spider-Man in a world that doesn't remember him—and the pressure of seeing his old friends move on without him—sparks a change in Peter Parker he may not have the power to control. But that transformation might also be the only thing that can stop a shocking new threat to the city and those he loves - a powerful villain no one can even see.",
+      "popularity": 295.863,
+      "poster_path": "/bjiS5ipwxb9JFy3XRRN4OAilSeX.jpg",
+      "release_date": "2026-07-29",
+      "softcore": false,
+      "title": "Spider-Man: Brand New Day",
+      "video": false,
+      "vote_average": 8.455,
+      "vote_count": 7140
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/wdjW11Tp4w9EfDBxbjyBJvDVHDA.jpg",
+      "genre_ids": [
+        16,
+        14,
+        10751
+      ],
+      "id": 1538497,
+      "media_type": "movie",
+      "original_language": "en",
+      "original_title": "Hexed",
+      "overview": "An impulsive and unconventional teenage girl named Billie discovers secret magical abilities which, once unleashed, hurtle her into a spectacle-filled journey out of suburbia and into a vast witch realm called Hexe. Forced to team up with her cautious mother, Alice, they uncover family mysteries that could change the world of witches forever.",
+      "popularity": 77.1409,
+      "poster_path": "/yykeYKbDBM9eUMJUucaaDo2mi1p.jpg",
+      "release_date": "2026-11-25",
+      "softcore": false,
+      "title": "Hexed",
+      "video": false,
+      "vote_average": 5.5,
+      "vote_count": 25
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/nfcXn5yvBejpbljQIBrTlOMQZoC.jpg",
+      "genre_ids": [
+        10752,
+        18
+      ],
+      "id": 1458300,
+      "media_type": "movie",
+      "original_language": "en",
+      "original_title": "The Mosquito Bowl",
+      "overview": "In the aftermath of Pearl Harbor, four college football stars enlist in the US Marines, discovering the strength of brotherhood and the cost of war.",
+      "popularity": 100.52,
+      "poster_path": "/uxYs0bNTF4XzM8LThJk2x3AJ0Iv.jpg",
+      "release_date": "2026-10-29",
+      "softcore": false,
+      "title": "The Mosquito Bowl",
+      "video": false,
+      "vote_average": 7.526,
+      "vote_count": 38
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/g1bEboMx1a8JCg1jXeDCh24RtgW.jpg",
+      "genre_ids": [
+        16,
+        10751,
+        35,
+        12,
+        14
+      ],
+      "id": 1595124,
+      "media_type": "movie",
+      "original_language": "en",
+      "original_title": "Steps",
+      "overview": "After being blamed for disrupting the Royal Ball with a stolen magic wand, a misunderstood stepsister accidentally turns her sister into a frog and must team up with Cinderella and an unlikely ally to save the kingdom and rewrite their fairytale ending.",
+      "popularity": 129.2548,
+      "poster_path": "/jtfCcWZ3ZyKdgi0u7JVOxEOSSJP.jpg",
+      "release_date": "2026-11-20",
+      "softcore": false,
+      "title": "Steps",
+      "video": false,
+      "vote_average": 6.991,
+      "vote_count": 114
+    }
+  ],
+  "total_pages": 2,
+  "total_results": 16
+}

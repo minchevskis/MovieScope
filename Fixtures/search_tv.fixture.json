@@ -1,0 +1,178 @@
+{
+  "page": 1,
+  "results": [
+    {
+      "adult": false,
+      "backdrop_path": "/tsRy63Mu5cu8etL1X7ZLyf7UP1M.jpg",
+      "first_air_date": "2008-01-20",
+      "genre_ids": [
+        18,
+        80
+      ],
+      "id": 1396,
+      "name": "Breaking Bad",
+      "origin_country": [
+        "US"
+      ],
+      "original_language": "en",
+      "original_name": "Breaking Bad",
+      "overview": "Walter White, a New Mexico chemistry teacher, is diagnosed with Stage III cancer and given a prognosis of only two years left to live. He becomes filled with a sense of fearlessness and an unrelenting desire to secure his family's financial future at any cost as he enters the dangerous world of drugs and crime.",
+      "popularity": 147.4875,
+      "poster_path": "/anFx9aTOOYqgS3v7x3R84Kz67ly.jpg",
+      "softcore": false,
+      "vote_average": 8.96,
+      "vote_count": 19191
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/nQEFW1hDgeU8vko0gFVn0qInKE8.jpg",
+      "first_air_date": "2011-08-09",
+      "genre_ids": [],
+      "id": 328174,
+      "name": "Breaking Italy",
+      "origin_country": [
+        "IT"
+      ],
+      "original_language": "it",
+      "original_name": "Breaking Italy",
+      "overview": "",
+      "popularity": 12.0938,
+      "poster_path": "/bXKCO8zonuQxI4DGYNa7CA7gavo.jpg",
+      "softcore": false,
+      "vote_average": 0.0,
+      "vote_count": 0
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/uvg18tl6b8PU4YUiQ7F9EczmzPC.jpg",
+      "first_air_date": "2018-07-07",
+      "genre_ids": [
+        35
+      ],
+      "id": 203942,
+      "name": "Breaking News: No Laugh Newsroom",
+      "origin_country": [
+        "US"
+      ],
+      "original_language": "en",
+      "original_name": "Breaking News: No Laugh Newsroom",
+      "overview": "In this newsroom, breaking means losing. Our reporters don't know what's about to be on the teleprompter, and every laugh is a point against them.",
+      "popularity": 23.3333,
+      "poster_path": "/upDguFeVhmMwGXeayxUwww6vzXQ.jpg",
+      "softcore": false,
+      "vote_average": 8.5,
+      "vote_count": 10
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/9ayox8zhcllxKRjP3NA5KBp5M5v.jpg",
+      "first_air_date": "2011-04-06",
+      "genre_ids": [
+        35,
+        10759,
+        80
+      ],
+      "id": 34541,
+      "name": "Breaking In",
+      "origin_country": [
+        "US"
+      ],
+      "original_language": "en",
+      "original_name": "Breaking In",
+      "overview": "Contra Security is a high tech security firm that specializes in breaking in as a way to test security measures. The team members comprise various skills, and even more various personalities.",
+      "popularity": 9.0633,
+      "poster_path": "/cDEglbhl4g6yFg203agZAOm8m3b.jpg",
+      "softcore": false,
+      "vote_average": 6.6,
+      "vote_count": 82
+    },
+    {
+      "adult": false,
+      "backdrop_path": null,
+      "first_air_date": "1963-09-16",
+      "genre_ids": [
+        18
+      ],
+      "id": 16377,
+      "name": "Breaking Point",
+      "origin_country": [
+        "US"
+      ],
+      "original_language": "en",
+      "original_name": "Breaking Point",
+      "overview": "",
+      "popularity": 6.7633,
+      "poster_path": "/zgb5jQ6wOreapkVXSdAH5hDmVd1.jpg",
+      "softcore": false,
+      "vote_average": 7.4,
+      "vote_count": 5
+    },
+    {
+      "adult": false,
+      "backdrop_path": null,
+      "first_air_date": "2002-07-17",
+      "genre_ids": [
+        18
+      ],
+      "id": 10728,
+      "name": "Breaking News",
+      "origin_country": [
+        "US"
+      ],
+      "original_language": "en",
+      "original_name": "Breaking News",
+      "overview": "Breaking News is an American drama television series about the fictional Milwaukee-based 24-hour cable news television network I-24, with the motto 'Around the Clock, Around the World.' The series premiered July 17, 2002, on Bravo.",
+      "popularity": 5.6836,
+      "poster_path": "/9JA2qZcOeOIjczg6ESyLE1of4bT.jpg",
+      "softcore": false,
+      "vote_average": 6.0,
+      "vote_count": 1
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/3tyLSzhTZRUJD1P28Zi2akckZez.jpg",
+      "first_air_date": "2026-07-24",
+      "genre_ids": [
+        35,
+        16,
+        80
+      ],
+      "id": 208208,
+      "name": "Breaking Bear",
+      "origin_country": [
+        "US"
+      ],
+      "original_language": "en",
+      "original_name": "Breaking Bear",
+      "overview": "The escapades of three bear siblings who decide they have to start selling drugs in order to raise money and save their home after gas companies start fracking next to their cave. The bears soon enlist other forest animals in a scheme that will pit them against oil companies, The Russian Mafia, local Hell’s Angels and polar bears who hate anything that isn’t white.",
+      "popularity": 4.8773,
+      "poster_path": "/4ZT3gTxOqWLH7MhOgLfh3y57agS.jpg",
+      "softcore": false,
+      "vote_average": 6.5,
+      "vote_count": 4
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/aSGu6vvaeRbsY5sHRKY2TKWXkul.jpg",
+      "first_air_date": "1980-11-29",
+      "genre_ids": [
+        18
+      ],
+      "id": 21394,
+      "name": "Breaking Away",
+      "origin_country": [
+        "US"
+      ],
+      "original_language": "en",
+      "original_name": "Breaking Away",
+      "overview": "Breaking Away is a 1980 American comedy-drama television series that was based on the 1979 film of the same name. It was created by Steve Tesich, who wrote the original film, and the film's director Peter Yates served as Executive Producer.\n\nAs a prequel, the series was set during the year prior to the events of the film. Shaun Cassidy took over the role of Dave Stohler, a young man mad about bicycle racing and all things Italian. Barbara Barrie, Jackie Earle Haley and John Ashton reprised their roles from the film. The television series was set in Bloomington, Indiana, but was actually shot in Athens, Georgia.\n\nThe show was caught up in the 1980 Screen Actors Guild Strike and did not begin production until that fall. While heavily promoted by ABC, it was overlooked by TV audiences once it got on the air and suffered low ratings. It was cancelled after eight episodes were filmed, though only seven episodes aired during its original run. ABC showed reruns of the show during the summer of 1981, and it was also rerun by the Arts & Entertainment cable channel during 1985–1987.",
+      "popularity": 2.4955,
+      "poster_path": "/2JRJVesVyy5PG0cxTaqfPFER5jv.jpg",
+      "softcore": false,
+      "vote_average": 7.0,
+      "vote_count": 3
+    }
+  ],
+  "total_pages": 1,
+  "total_results": 8
+}

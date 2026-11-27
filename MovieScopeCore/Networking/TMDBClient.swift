@@ -73,7 +73,7 @@ public struct TMDBClient: Sendable {
         string.addingPercentEncoding(withAllowedCharacters: unreserved) ?? string
     }
 
-    private static func makeDecoder() -> JSONDecoder {
+    static func makeDecoder() -> JSONDecoder {
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
         return decoder
