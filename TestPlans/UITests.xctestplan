@@ -1,0 +1,29 @@
+{
+  "configurations" : [
+    {
+      "id" : "C3A91F57-2E8B-4D6A-8F14-6B0D2E7C9A33",
+      "name" : "Default",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : false,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:MovieScope.xcodeproj",
+      "identifier" : "A1000000000000000000E001",
+      "name" : "MovieScope"
+    }
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:MovieScope.xcodeproj",
+        "identifier" : "A10000000000000000009001",
+        "name" : "MovieScopeUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

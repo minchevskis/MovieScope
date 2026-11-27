@@ -1,0 +1,50 @@
+{
+  "configurations" : [
+    {
+      "id" : "4B7E2D19-6A3C-4F80-B2D5-91C6E8A40F22",
+      "name" : "Default",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : {
+      "targets" : [
+        {
+          "containerPath" : "container:MovieScope.xcodeproj",
+          "identifier" : "A1000000000000000000C001",
+          "name" : "MovieScopeCore"
+        },
+        {
+          "containerPath" : "container:MovieScope.xcodeproj",
+          "identifier" : "A1000000000000000000E001",
+          "name" : "MovieScope"
+        }
+      ]
+    },
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:MovieScope.xcodeproj",
+      "identifier" : "A1000000000000000000E001",
+      "name" : "MovieScope"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:MovieScope.xcodeproj",
+        "identifier" : "A1000000000000000000D001",
+        "name" : "MovieScopeCoreTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:MovieScope.xcodeproj",
+        "identifier" : "A1000000000000000000B001",
+        "name" : "MovieScopeTests"
+      }
+    }
+  ],
+  "version" : 1
+}
