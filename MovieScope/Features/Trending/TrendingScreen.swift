@@ -5,6 +5,7 @@ import SwiftUI
 struct TrendingScreen<Destination: View>: View {
     let imageProvider: ImageProvider
     let favorites: Set<MediaID>
+    let onToggleFavorite: (MediaSummary) -> Void
     @ViewBuilder let destination: (MediaSummary) -> Destination
 
     @State private var viewModel: TrendingViewModel
@@ -14,10 +15,12 @@ struct TrendingScreen<Destination: View>: View {
         service: any TMDBService,
         imageProvider: ImageProvider,
         favorites: Set<MediaID> = [],
+        onToggleFavorite: @escaping (MediaSummary) -> Void = { _ in },
         @ViewBuilder destination: @escaping (MediaSummary) -> Destination
     ) {
         self.imageProvider = imageProvider
         self.favorites = favorites
+        self.onToggleFavorite = onToggleFavorite
         self.destination = destination
         _viewModel = State(initialValue: TrendingViewModel(service: service))
     }
@@ -52,7 +55,8 @@ struct TrendingScreen<Destination: View>: View {
                 onSelect: { selection = $0 },
                 onDisplayIndex: { index in Task { await viewModel.itemDisplayed(at: index) } },
                 onRefresh: { Task { await viewModel.refresh() } },
-                onRetry: { Task { await viewModel.retry() } }
+                onRetry: { Task { await viewModel.retry() } },
+                onToggleFavorite: onToggleFavorite
             )
             .ignoresSafeArea()
         }

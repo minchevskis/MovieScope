@@ -7,42 +7,60 @@ struct RootView: View {
 
     var body: some View {
         if dependencies.hasCredentials {
-            TabView {
-                Tab("Trending", systemImage: "flame") {
-                    NavigationStack {
-                        TrendingScreen(
-                            service: dependencies.service,
-                            imageProvider: dependencies.imageProvider
-                        ) { summary in
-                            DetailsScreen(id: summary.id, placeholder: summary, service: dependencies.service)
-                        }
-                        .aboutToolbar()
-                    }
-                }
-                .accessibilityIdentifier(AccessibilityID.Root.trendingTab)
-
-                Tab("Search", systemImage: "magnifyingglass", role: .search) {
-                    NavigationStack {
-                        SearchScreen(service: dependencies.service) { summary in
-                            DetailsScreen(id: summary.id, placeholder: summary, service: dependencies.service)
-                        }
-                        .aboutToolbar()
-                    }
-                }
-                .accessibilityIdentifier(AccessibilityID.Root.searchTab)
-
-                Tab("Favorites", systemImage: "heart") {
-                    NavigationStack {
-                        ContentUnavailableView("Favorites", systemImage: "heart")
-                            .aboutToolbar()
-                    }
-                }
-                .accessibilityIdentifier(AccessibilityID.Root.favoritesTab)
-            }
-            .tabViewStyle(.sidebarAdaptable)
+            tabs
+                .task { await dependencies.favorites.load() }
         } else {
             MissingTokenView()
         }
+    }
+
+    private var tabs: some View {
+        TabView {
+            Tab("Trending", systemImage: "flame") {
+                NavigationStack {
+                    TrendingScreen(
+                        service: dependencies.service,
+                        imageProvider: dependencies.imageProvider,
+                        favorites: dependencies.favorites.ids,
+                        onToggleFavorite: toggleFavorite,
+                        destination: details
+                    )
+                    .aboutToolbar()
+                }
+            }
+            .accessibilityIdentifier(AccessibilityID.Root.trendingTab)
+
+            Tab("Search", systemImage: "magnifyingglass", role: .search) {
+                NavigationStack {
+                    SearchScreen(
+                        service: dependencies.service,
+                        favorites: dependencies.favorites.ids,
+                        destination: details
+                    )
+                    .aboutToolbar()
+                }
+            }
+            .accessibilityIdentifier(AccessibilityID.Root.searchTab)
+
+            Tab("Favorites", systemImage: "heart") {
+                NavigationStack {
+                    FavoritesScreen(destination: details)
+                        .aboutToolbar()
+                }
+            }
+            .accessibilityIdentifier(AccessibilityID.Root.favoritesTab)
+        }
+        .tabViewStyle(.sidebarAdaptable)
+    }
+
+    private func details(for summary: MediaSummary) -> some View {
+        DetailsScreen(id: summary.id, placeholder: summary, service: dependencies.service) { summary in
+            FavoriteButton(summary: summary)
+        }
+    }
+
+    private func toggleFavorite(_ summary: MediaSummary) {
+        Task { await dependencies.favorites.toggle(summary) }
     }
 }
 

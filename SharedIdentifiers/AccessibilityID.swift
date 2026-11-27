@@ -34,6 +34,7 @@ nonisolated enum AccessibilityID {
         static let cast = "details.cast"
         static let reviews = "details.reviews"
         static let facts = "details.facts"
+        static let favoriteButton = "details.favorite"
     }
 
     enum Search {
@@ -42,6 +43,12 @@ nonisolated enum AccessibilityID {
         static let list = "search.list"
 
         static func row(_ index: Int) -> String { "search.row.\(index)" }
+    }
+
+    enum Favorites {
+        static let empty = "favorites.empty"
+
+        static func item(_ index: Int) -> String { "favorites.item.\(index)" }
     }
 
     enum MissingToken {

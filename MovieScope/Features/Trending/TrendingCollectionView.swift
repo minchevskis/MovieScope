@@ -13,6 +13,7 @@ struct TrendingCollectionView: UIViewControllerRepresentable {
     let onDisplayIndex: (Int) -> Void
     let onRefresh: () -> Void
     let onRetry: () -> Void
+    let onToggleFavorite: (MediaSummary) -> Void
 
     func makeUIViewController(context: Context) -> TrendingViewController {
         TrendingViewController(imageProvider: imageProvider)
@@ -23,6 +24,7 @@ struct TrendingCollectionView: UIViewControllerRepresentable {
         controller.onDisplayIndex = onDisplayIndex
         controller.onRefresh = onRefresh
         controller.onRetry = onRetry
+        controller.onToggleFavorite = onToggleFavorite
         controller.update(items: items, phase: phase, favorites: favorites)
     }
 }

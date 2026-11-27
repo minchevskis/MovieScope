@@ -9,6 +9,7 @@ final class TrendingViewController: UIViewController {
     var onDisplayIndex: (Int) -> Void = { _ in }
     var onRefresh: () -> Void = {}
     var onRetry: () -> Void = {}
+    var onToggleFavorite: (MediaSummary) -> Void = { _ in }
 
     private let imageProvider: ImageProvider
     private var itemsByID: [MediaID: MediaSummary] = [:]
@@ -188,6 +189,27 @@ extension TrendingViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let id = dataSource.itemIdentifier(for: indexPath), let summary = itemsByID[id] else { return }
         onSelect(summary)
+    }
+
+    func collectionView(
+        _ collectionView: UICollectionView,
+        contextMenuConfigurationForItemsAt indexPaths: [IndexPath],
+        point: CGPoint
+    ) -> UIContextMenuConfiguration? {
+        guard let indexPath = indexPaths.first,
+              let id = dataSource.itemIdentifier(for: indexPath),
+              let summary = itemsByID[id] else { return nil }
+        let isFavorite = favorites.contains(id)
+        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ in
+            let toggle = UIAction(
+                title: isFavorite ? "Remove from Favorites" : "Add to Favorites",
+                image: UIImage(systemName: isFavorite ? "heart.slash" : "heart"),
+                attributes: isFavorite ? .destructive : []
+            ) { _ in
+                self?.onToggleFavorite(summary)
+            }
+            return UIMenu(children: [toggle])
+        }
     }
 
     func collectionView(

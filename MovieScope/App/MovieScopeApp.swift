@@ -13,6 +13,7 @@ struct MovieScopeApp: App {
             } else if let dependencies {
                 RootView(dependencies: dependencies)
                     .environment(\.imageProvider, dependencies.imageProvider)
+                    .environment(dependencies.favorites)
             } else {
                 Color.clear.onAppear {
                     dependencies = AppDependencies(environment: environment)

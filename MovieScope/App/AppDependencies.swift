@@ -8,6 +8,7 @@ final class AppDependencies {
     let environment: AppEnvironment
     let service: any TMDBService
     let imageProvider: ImageProvider
+    let favorites: FavoritesModel
     let hasCredentials: Bool
 
     init(environment: AppEnvironment, bundle: Bundle = .main) {
@@ -33,6 +34,9 @@ final class AppDependencies {
         let client = TMDBClient(transport: apiTransport, credentials: credentials)
         service = client
         hasCredentials = credentials.accessToken() != nil
+        favorites = FavoritesModel(
+            store: FavoritesStore(fileURL: Self.supportDirectory.appendingPathComponent("favorites.json"))
+        )
         imageProvider = ImageProvider(
             pipeline: ImagePipeline(transport: imageTransport),
             configurationStore: ImageConfigurationStore(
