@@ -66,7 +66,7 @@ enum TrendingLayout {
             subitems: [item]
         )
         let section = NSCollectionLayoutSection(group: group)
-        section.orthogonalScrollingBehavior = .groupPagingCentered
+        section.orthogonalScrollingBehavior = .groupPaging
         section.interGroupSpacing = spacing
         section.contentInsets = .init(top: 4, leading: horizontalInset, bottom: 24, trailing: horizontalInset)
         section.boundarySupplementaryItems = [header()]
