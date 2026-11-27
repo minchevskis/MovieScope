@@ -15,12 +15,15 @@ struct PeopleSection: View {
 
         if !rows.isEmpty {
             DetailsSection(details.summary.id.kind == .tv ? "Creators" : "Filmmakers") {
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: 12) {
                     ForEach(rows, id: \.0) { title, people in
-                        LabeledContent(title) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(title)
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
                             Text(people.map(\.name).joined(separator: ", "))
-                                .multilineTextAlignment(.trailing)
                         }
+                        .accessibilityElement(children: .combine)
                     }
                 }
                 .accessibilityIdentifier(AccessibilityID.Details.people)

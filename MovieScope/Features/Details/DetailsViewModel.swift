@@ -82,4 +82,11 @@ nonisolated enum DetailsFormatting {
         }
         return parts.joined(separator: " · ")
     }
+
+    /// Spoken/visible rating summary; unreleased titles have no votes yet.
+    static func ratingDescription(average: Double, votes: Int, locale: Locale = .current) -> String {
+        guard votes > 0 else { return "Not rated yet" }
+        let score = Formatters.rating(average, locale: locale)
+        return "Rated \(score) out of 10 from \(Formatters.votes(votes, locale: locale))"
+    }
 }

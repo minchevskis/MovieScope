@@ -102,4 +102,15 @@ final class DetailsFormattingTests: XCTestCase {
 
         XCTAssertEqual(DetailsFormatting.metadataLine(for: details), "1 season · 1 episode")
     }
+
+    func test_ratingAccessibility_unrated_saysNotRatedYet() {
+        XCTAssertEqual(DetailsFormatting.ratingDescription(average: 0, votes: 0), "Not rated yet")
+    }
+
+    func test_ratingAccessibility_rated_includesScoreAndVotes() {
+        XCTAssertEqual(
+            DetailsFormatting.ratingDescription(average: 7.84, votes: 1200, locale: Locale(identifier: "en_US")),
+            "Rated 7.8 out of 10 from 1,200 votes"
+        )
+    }
 }

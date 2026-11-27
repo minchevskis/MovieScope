@@ -72,23 +72,30 @@ struct RatingView: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            Image(systemName: "star.fill")
+            Image(systemName: votes > 0 ? "star.fill" : "star")
                 .foregroundStyle(.yellow)
-            Text(Formatters.rating(average))
-                .font(.title2.bold())
-                + Text(" / 10")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-            Divider().frame(height: 20)
-            Text(Formatters.votes(votes))
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+            if votes > 0 {
+                HStack(alignment: .firstTextBaseline, spacing: 4) {
+                    Text(Formatters.rating(average))
+                        .font(.title2.bold())
+                    Text("/ 10")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+                Divider().frame(height: 20)
+                Text(Formatters.votes(votes))
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            } else {
+                Text("Not rated yet")
+                    .font(.subheadline.weight(.semibold))
+            }
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
         .glassOrMaterial()
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("Rated \(Formatters.rating(average)) out of 10 from \(Formatters.votes(votes))")
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(DetailsFormatting.ratingDescription(average: average, votes: votes))
         .accessibilityIdentifier(AccessibilityID.Details.rating)
     }
 }
