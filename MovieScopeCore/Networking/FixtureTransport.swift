@@ -30,7 +30,8 @@ public struct FixtureTransport: HTTPTransport {
         guard let url = request.url else { throw APIError.invalidRequest }
         if url.host() == "image.tmdb.org" {
             let seed = url.lastPathComponent.unicodeScalars.reduce(0) { $0 &+ Int($1.value) }
-            return try respond(url, status: 200, body: PlaceholderImageFactory.pngData(width: 342, height: 513, seed: seed))
+            let artwork = PlaceholderImageFactory.pngData(width: 342, height: 513, seed: seed)
+            return try respond(url, status: 200, body: artwork)
         }
         guard let name = fixtureName(for: url), let body = fixtures[name] else {
             return try respond(url, status: 404, body: Data(#"{"status_code":34,"success":false}"#.utf8))
