@@ -9,6 +9,8 @@ struct SearchScreen<Destination: View>: View {
 
     @State private var viewModel: SearchViewModel
     @State private var selection: MediaSummary?
+    @State private var isSearchPresented = false
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     init(
         service: any TMDBService,
@@ -23,7 +25,12 @@ struct SearchScreen<Destination: View>: View {
     var body: some View {
         content
             .navigationTitle("Search")
-            .searchable(text: $viewModel.query, prompt: "Movies or TV shows")
+            .searchable(
+                text: $viewModel.query,
+                isPresented: $isSearchPresented,
+                placement: searchPlacement,
+                prompt: "Movies or TV shows"
+            )
             .searchScopes($viewModel.scope, activation: .onSearchPresentation) {
                 Text("Movies").tag(MediaKind.movie)
                 Text("TV Shows").tag(MediaKind.tv)
@@ -31,6 +38,16 @@ struct SearchScreen<Destination: View>: View {
             .navigationDestination(item: $selection) { summary in
                 destination(summary)
             }
+            // A dedicated search tab opens ready to type, with the scopes visible
+            // (iPadOS otherwise collapses the field into a toolbar button).
+            .onAppear { isSearchPresented = true }
+    }
+
+    /// iPhone keeps the system placement (bottom field on iOS 26). iPad pins the
+    /// field and its scopes under the navigation bar instead of collapsing them
+    /// into a toolbar button.
+    private var searchPlacement: SearchFieldPlacement {
+        horizontalSizeClass == .regular ? .navigationBarDrawer(displayMode: .always) : .automatic
     }
 
     @ViewBuilder
