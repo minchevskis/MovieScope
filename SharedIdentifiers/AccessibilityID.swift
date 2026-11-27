@@ -18,6 +18,14 @@ nonisolated enum AccessibilityID {
         static let attribution = "about.attribution"
     }
 
+    enum Trending {
+        static let collection = "trending.collection"
+        static let retryNextPage = "trending.retryNextPage"
+        static let nextPageSpinner = "trending.nextPageSpinner"
+
+        static func item(_ index: Int) -> String { "trending.item.\(index)" }
+    }
+
     enum MissingToken {
         static let screen = "missingToken.screen"
     }

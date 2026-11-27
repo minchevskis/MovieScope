@@ -10,8 +10,13 @@ struct RootView: View {
             TabView {
                 Tab("Trending", systemImage: "flame") {
                     NavigationStack {
-                        ContentUnavailableView("Trending", systemImage: "flame")
-                            .aboutToolbar()
+                        TrendingScreen(
+                            service: dependencies.service,
+                            imageProvider: dependencies.imageProvider
+                        ) { summary in
+                            Text(summary.title)
+                        }
+                        .aboutToolbar()
                     }
                 }
                 .accessibilityIdentifier(AccessibilityID.Root.trendingTab)
