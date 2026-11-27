@@ -33,6 +33,8 @@ public actor ImagePipeline {
     private let memoryCache = NSCache<NSString, CGImage>()
     private var inFlight: [ImageRequest: InFlight] = [:]
     private var prefetchWaiters: [ImageRequest: UUID] = [:]
+    /// Decoded variants per TMDB file name (e.g. `abc.jpg` at several sizes).
+    private var variantsByFile: [String: Set<ImageRequest>] = [:]
 
     public init(
         transport: any HTTPTransport,
@@ -58,6 +60,15 @@ public actor ImagePipeline {
 
     public func cachedImage(for request: ImageRequest) -> CGImage? {
         memoryCache.object(forKey: Self.cacheKey(for: request))
+    }
+
+    /// The largest variant of an image already in memory, whatever size it was
+    /// loaded at. Used as an instant low-resolution preview while the size a
+    /// new screen needs is loading (e.g. the grid poster on the details screen).
+    public func largestCachedImage(forImagePath path: String) -> CGImage? {
+        let file = (path as NSString).lastPathComponent
+        let variants = (variantsByFile[file] ?? []).sorted { $0.maxPixelSize > $1.maxPixelSize }
+        return variants.lazy.compactMap { self.cachedImage(for: $0) }.first
     }
 
     /// Starts downloading images expected to be needed soon (e.g. rows about to
@@ -117,6 +128,7 @@ public actor ImagePipeline {
     private func finish(_ request: ImageRequest, id: UUID, image: CGImage?) {
         if let image {
             memoryCache.setObject(image, forKey: Self.cacheKey(for: request), cost: image.bytesPerRow * image.height)
+            variantsByFile[request.url.lastPathComponent, default: []].insert(request)
         }
         if inFlight[request]?.id == id {
             inFlight[request] = nil

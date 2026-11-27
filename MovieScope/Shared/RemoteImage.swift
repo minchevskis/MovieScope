@@ -7,6 +7,8 @@ import SwiftUI
 struct RemoteImage: View {
     let path: String?
     let category: ImageCategory
+    /// Show any cached variant of the same artwork immediately (low-res first).
+    var usesCachedPreview = false
 
     @Environment(\.imageProvider) private var imageProvider
     @Environment(\.displayScale) private var displayScale
@@ -47,6 +49,9 @@ struct RemoteImage: View {
 
     private func load() async {
         guard let imageProvider, renderedSize.width > 0 else { return }
+        if usesCachedPreview, image == nil, let preview = await imageProvider.cachedPreview(path: path) {
+            image = preview
+        }
         do {
             let loaded = try await imageProvider.image(
                 path: path,

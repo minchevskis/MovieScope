@@ -119,6 +119,24 @@ final class ImagePipelineTests: XCTestCase {
         XCTAssertEqual(large.height, 400)
     }
 
+    func test_largestCachedImage_returnsBiggestVariantForPath() async throws {
+        let transport = FakeTransport([.response(status: 200, body: png), .response(status: 200, body: png)])
+        let sut = ImagePipeline(transport: transport)
+        let smallURL = URL(fileURLWithPath: "/t/p/w92/poster.jpg")
+        _ = try await sut.image(for: ImageRequest(url: smallURL, maxPixelSize: 100))
+        _ = try await sut.image(for: ImageRequest(url: posterURL, maxPixelSize: 300))
+
+        let preview = await sut.largestCachedImage(forImagePath: "/poster.jpg")
+
+        XCTAssertEqual(preview?.height, 300)
+    }
+
+    func test_largestCachedImage_unknownPath_isNil() async {
+        let preview = await ImagePipeline(transport: FakeTransport()).largestCachedImage(forImagePath: "/missing.jpg")
+
+        XCTAssertNil(preview)
+    }
+
     private func waitUntil(_ condition: () async -> Bool) async {
         let deadline = ContinuousClock.now + .seconds(2)
         while await !condition(), ContinuousClock.now < deadline {

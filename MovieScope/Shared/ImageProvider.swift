@@ -24,6 +24,15 @@ final class ImageProvider {
         return UIImage(cgImage: image, scale: scale, orientation: .up)
     }
 
+    /// Any already-decoded variant of `path`, for showing instantly while the
+    /// right size loads. Never triggers a download.
+    func cachedPreview(path: String?) async -> UIImage? {
+        guard let path, !path.isEmpty, let image = await pipeline.largestCachedImage(forImagePath: path) else {
+            return nil
+        }
+        return UIImage(cgImage: image)
+    }
+
     func prefetch(paths: [String], category: ImageCategory, pointSize: CGSize, scale: CGFloat) {
         Task {
             let requests = await requests(paths: paths, category: category, pointSize: pointSize, scale: scale)

@@ -12,7 +12,7 @@ struct DetailsHeaderView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            RemoteImage(path: summary.backdropPath ?? summary.posterPath, category: .backdrop)
+            RemoteImage(path: summary.backdropPath ?? summary.posterPath, category: .backdrop, usesCachedPreview: true)
                 .aspectRatio(16 / 9, contentMode: .fit)
                 .frame(maxWidth: .infinity)
                 .overlay(alignment: .bottom) {
@@ -45,7 +45,7 @@ struct DetailsHeaderView: View {
     }
 
     private var poster: some View {
-        RemoteImage(path: summary.posterPath, category: .poster)
+        RemoteImage(path: summary.posterPath, category: .poster, usesCachedPreview: true)
             .aspectRatio(2 / 3, contentMode: .fit)
             .clipShape(.rect(cornerRadius: 12))
             .shadow(color: .black.opacity(0.25), radius: 8, y: 4)
