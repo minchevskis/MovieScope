@@ -119,6 +119,84 @@ final class ImagePipelineTests: XCTestCase {
         await transport.waitForCancellations(2)
     }
 
+    func test_pipeline_visibleImage_startsBeforeQueuedPrefetches() async throws {
+        let transport = ControlledTransport()
+        let sut = ImagePipeline(transport: transport, maxConcurrentDownloads: 1)
+        let (first, queued, visible) = (poster("a"), poster("b"), poster("c"))
+        await sut.prefetch([first, queued])
+        await transport.waitForRequests(1)
+
+        // A cell comes on screen while the only slot is busy with a prefetch.
+        let shown = Task { try await sut.image(for: visible) }
+        try await Task.sleep(for: .milliseconds(100))
+        await transport.respond(to: first.url, body: png)
+        await transport.waitForRequests(2)
+
+        let order = await transport.requestedURLs
+        XCTAssertEqual(order, [first.url, visible.url], "The on-screen image should not wait behind a prefetch")
+        shown.cancel()
+    }
+
+    func test_pipeline_prefetchThatBecomesVisible_jumpsTheQueue() async throws {
+        let transport = ControlledTransport()
+        let sut = ImagePipeline(transport: transport, maxConcurrentDownloads: 1)
+        let (first, second, third) = (poster("a"), poster("b"), poster("c"))
+        await sut.prefetch([first, second, third])
+        await transport.waitForRequests(1)
+
+        // The third prefetched row scrolls into view before the second one is needed.
+        let shown = Task { try await sut.image(for: third) }
+        try await Task.sleep(for: .milliseconds(100))
+        await transport.respond(to: first.url, body: png)
+        await transport.waitForRequests(2)
+
+        let order = await transport.requestedURLs
+        XCTAssertEqual(order, [first.url, third.url], "A queued prefetch that becomes visible should go next")
+        shown.cancel()
+    }
+
+    func test_pipeline_neverRunsMoreDownloadsThanAllowed() async throws {
+        let transport = ControlledTransport()
+        let sut = ImagePipeline(transport: transport, maxConcurrentDownloads: 2)
+        let requests = ["a", "b", "c"].map(poster)
+
+        await sut.prefetch(requests)
+        await transport.waitForRequests(2)
+        try await Task.sleep(for: .milliseconds(50))
+        let started = await transport.requestedURLs
+        XCTAssertEqual(started.count, 2, "The third download waits for a free slot")
+
+        await transport.respond(to: requests[0].url, body: png)
+        await transport.waitForRequests(3)
+    }
+
+    func test_pipeline_queuedDownloadCancelledBeforeItStarts_neverStarts() async throws {
+        let transport = ControlledTransport()
+        let sut = ImagePipeline(transport: transport, maxConcurrentDownloads: 1)
+        let (first, queued, next) = (poster("a"), poster("b"), poster("c"))
+        await sut.prefetch([first, queued, next])
+        await transport.waitForRequests(1)
+
+        await sut.cancelPrefetch([queued])
+        await transport.respond(to: first.url, body: png)
+        await transport.waitForRequests(2)
+
+        let order = await transport.requestedURLs
+        XCTAssertEqual(order, [first.url, next.url])
+    }
+
+    func test_pipeline_failedDownload_freesItsSlot() async throws {
+        let transport = ControlledTransport()
+        let sut = ImagePipeline(transport: transport, maxConcurrentDownloads: 1)
+        let (failing, next) = (poster("a"), poster("b"))
+        await sut.prefetch([failing, next])
+        await transport.waitForRequests(1)
+
+        await transport.respond(to: failing.url, status: 500, body: Data())
+
+        await transport.waitForRequests(2)
+    }
+
     func test_pipeline_httpError_throws() async {
         let sut = ImagePipeline(transport: FakeTransport([.response(status: 404, body: Data())]))
 
@@ -155,6 +233,10 @@ final class ImagePipelineTests: XCTestCase {
         let preview = await ImagePipeline(transport: FakeTransport()).largestCachedImage(forImagePath: "/missing.jpg")
 
         XCTAssertNil(preview)
+    }
+
+    private func poster(_ name: String) -> ImageRequest {
+        ImageRequest(url: URL(fileURLWithPath: "/t/p/w342/\(name).jpg"), maxPixelSize: 300)
     }
 
     private func waitUntil(_ condition: () async -> Bool) async {
