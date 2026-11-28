@@ -90,7 +90,7 @@ flowchart TB
 ```
 
 **Pattern: MVVM with constructor injection.**
-- View models depend on protocols (`TMDBService`, `HTTPTransport`, `FavoritesStoring`, `Sleeper`), never on concrete types.
+- View models depend on protocols (`TMDBService`, `FavoritesStoring`, `Sleeper`), never on concrete types. Core does the same inside: the client and image pipeline depend on `HTTPTransport` and `CredentialProvider`.
 - One composition root wires everything; tests pass in fakes. No DI library.
 - View models are created on events, never in a view's initializer (which SwiftUI re-runs on every redraw): the tab screens' view models at launch, a details view model when a title is tapped.
 
@@ -101,7 +101,7 @@ flowchart TB
 **Generics.**
 - `Endpoint<Response>` ties a request to its decoded type.
 - `Page<Item>`, `PaginatedCollection<Item>` and `PaginationController<Item>` are shared by Trending and Search.
-- `Throttler<Value>`.
+- `Throttler<Value>` and `RequestQueue<ID>`.
 
 **Protocol-oriented seams.**
 - Transport: live, fixture and fake implementations.
@@ -128,7 +128,7 @@ Every target uses Swift 6 language mode, so data-race safety is checked at compi
 
 **Heavy work runs off the actors.** JSON decoding and ImageIO downsampling run in `nonisolated` code, and downloads start in `Task { @concurrent … }`.
 
-**No escape hatches.** There is no `@unchecked Sendable`, no `nonisolated(unsafe)` and no lock-wrapped boxes. `NSCache` isn't `Sendable`, so it never leaves its actor. Test-only shared state uses `Synchronization.Mutex`.
+**No escape hatches.** There is no `@unchecked Sendable`, no `nonisolated(unsafe)` and no hand-rolled lock wrappers. `NSCache` isn't `Sendable`, so it never leaves its actor. The little shared state outside actors (test helpers, and `FixtureTransport` behind test-data mode) uses the standard library's `Synchronization.Mutex`.
 
 **Cancellation is end to end:**
 - Leaving a details screen cancels its request (`.task`).
