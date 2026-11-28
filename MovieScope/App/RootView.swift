@@ -31,7 +31,10 @@ struct RootView: View {
             }
             .accessibilityIdentifier(AccessibilityID.Root.trendingTab)
 
-            Tab("Search", systemImage: "magnifyingglass", role: .search) {
+            // A plain tab on purpose: with `role: .search`, iOS 26 merges the field
+            // into the tab bar and shows the Movies / TV Shows scopes only the
+            // first time search opens (SearchUITests covers reopening).
+            Tab("Search", systemImage: "magnifyingglass") {
                 NavigationStack {
                     SearchScreen(
                         viewModel: dependencies.search,

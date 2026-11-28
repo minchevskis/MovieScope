@@ -51,6 +51,38 @@ final class SearchUITests: XCTestCase {
         XCTAssertTrue(reviews.exists)
         attachScreenshot(of: app, named: "details-tv-reviews")
     }
+
+    /// The kind must be choosable every time search opens, not only the first
+    /// time (iOS 26 showed the scopes once, then never again).
+    func test_search_scopesAppearEveryTimeSearchOpens() {
+        let app = AppLauncher.launch()
+        app.openTab(AccessibilityID.Root.searchTab, title: "Search")
+        let field = app.searchFields.firstMatch
+        let tvScope = app.buttons["TV Shows"].firstMatch
+
+        for attempt in 1...3 {
+            field.waitToAppear()
+            field.tap()
+            XCTAssertTrue(tvScope.waitForExistence(timeout: 3), "No scopes when search opened (attempt \(attempt))")
+            attachScreenshot(of: app, named: "search-open-\(attempt)")
+            guard let close = app.searchCloseButton else {
+                // iPad pins the field and scopes under the navigation bar. They
+                // never hide, so there is no reopening to check.
+                return
+            }
+            close.tap()
+            XCTAssertTrue(tvScope.waitForNonExistence(timeout: 3), "Scopes stayed after search closed (attempt \(attempt))")
+        }
+    }
+}
+
+@MainActor
+extension XCUIApplication {
+    /// The button that closes active search: Close next to the field on iOS 26
+    /// iPhone, Cancel on iOS 18. `nil` on iPad, where search stays pinned.
+    var searchCloseButton: XCUIElement? {
+        ["Close", "Cancel"].lazy.map { self.buttons[$0].firstMatch }.first { $0.exists }
+    }
 }
 
 @MainActor
