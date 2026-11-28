@@ -200,3 +200,60 @@ The full context is in `DESIGN.md`.
     initializer), so it has no test that failed first; the tab and details
     flows are covered by the existing UI tests.
 
+
+## 2026-11-28: Search is a plain tab
+- **Decision:** The Search tab no longer uses `role: .search`.
+- **Alternatives:** Keeping the role and drawing a custom Movies / TV Shows
+  picker; re-creating the search field every time it opens.
+- **Reason:** On iOS 26 a search-role tab merges its field into the tab bar,
+  and the scope bar then appears only the first time search opens. This was
+  seen on a device and reproduced on the iOS 26.5 simulator. Removing
+  `isPresented` or changing the scope activation didn't help; removing the role
+  alone did. The brief needs the kind chosen in advance, so the scopes must
+  always be there. As a plain tab, Search opens straight into the field with
+  the scopes under it. `test_search_scopesAppearEveryTimeSearchOpens` failed
+  before the change. iPhone no longer uses the bottom field mentioned in the
+  iPad entry above.
+
+## 2026-11-28: Image loading soft spots
+- **Decision:** Three weaknesses found in a further self-review were fixed,
+  each with a test that failed first:
+  - Images on screen no longer wait behind prefetches. A `RequestQueue` with
+    a high and a low lane replaces the first-come-first-served
+    `RequestLimiter` actor, and a queued prefetch that comes on screen is
+    promoted. The queue is a plain value inside the `ImagePipeline` actor, so
+    a promotion can't race the download it moves. Downloads wait for a slot
+    on a continuation the pipeline resumes.
+  - Prefetch and cancel requests from the collection view are applied in the
+    order they were made. Each starts with an async configuration lookup, so
+    a cancel could overtake its prefetch and leave that download running.
+  - The index of decoded sizes per file drops entries the memory cache has
+    evicted: on lookup, and in a sweep whenever it outgrows a threshold that
+    becomes twice what survived.
+- **Alternatives:** Adding a promotion message to the `RequestLimiter` actor
+  (it could arrive before the download it promotes); reserving slots for
+  on-screen images (a visible image that joins a queued prefetch would still
+  wait); an `NSCacheDelegate` for evictions (called on arbitrary threads,
+  outside the actor).
+- **Reason:** Each had a real cost: a slower image on screen during fast
+  scrolling, a wasted download, and an index that grew for as long as the app
+  ran.
+- **Calls made:** `RequestLimiter` and its tests were removed instead of being
+  left unused. Its guarantees (the cap, a cancelled waiter never starts, a
+  failure frees its slot) are now `ImagePipeline` tests.
+
+## 2026-11-28: Featured cards show a description; offline mode is the one open item
+- **Decision:** The five featured cards now show a one-line overview under
+  the title, like the grid cards' three-line one, so every Trending entity
+  has a title, an image and a short description (brief point 1c). Offline mode
+  stays the single unfinished feature. Apps for tvOS and visionOS, and a
+  backend proxy for the token, are recorded as scope decisions rather than
+  unfinished work.
+- **Alternatives:** Leaving the featured cards as they were; building tvOS or
+  visionOS apps; adding a proxy server.
+- **Reason:** 1c is a required point, and its gap was an oversight found while
+  checking every point of the brief. The brief's own bonus asks for a core
+  framework "to be consumed" by other platforms, which is delivered; full apps
+  for them would be new scope two days before the deadline. A proxy needs a
+  server a reviewer couldn't run. Image cache retention moves into the offline
+  mode design, since both follow TMDB's 6-month caching limit.

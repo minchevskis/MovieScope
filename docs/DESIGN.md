@@ -48,7 +48,7 @@ is met. Brief numbering: requirement 2 has only sub-item (a); there is no 2b.
 | \* All images fetched based on view size | §6.5, §4.3 Image sizing |
 | Bonus: local favorites + indicator on the entity | §6.4 |
 | Bonus: offline mode (storage of choice) | Partial. Favorites and cached images work offline; the rest is deferred (§9) |
-| Bonus: pre-cache via concurrent/queued download | §6.1 Prefetching, §4.3 Request limiter |
+| Bonus: pre-cache via concurrent/queued download | §6.1 Prefetching, §4.3 Request queue |
 | Bonus: low-res image before the final one | §6.2 [Should] |
 | Bonus: image caching mechanism | §4.3 Image pipeline |
 | Bonus: `.xcframework` core for tvOS, iOS, iPadOS, macOS | §8 (visionOS added, as the Goals mention it) |
@@ -160,7 +160,6 @@ control" evidence.
 - Shared mutable state lives in actors:
   - `ImagePipeline`
   - `FavoritesStore`
-  - `RequestLimiter`
   - `ImageConfigurationStore`
 - CPU-heavy work (JSON decoding, ImageIO downsampling) runs in `nonisolated`
   functions, not on the actor's executor.
@@ -222,8 +221,12 @@ control" evidence.
   - The first value fires immediately, then at most one per interval. The
     **latest value is always delivered** at the end of a burst.
   - `cancel()` and `flush()` (fire the pending value now).
-- **Request limiter**: an actor capping concurrent operations (FIFO). The image
-  pipeline uses it to bound downloads. This is the "queue and concurrency" evidence.
+- **Request queue**: decides which downloads run, at most 6 at once, with a
+  high-priority lane for images on screen and a low one for prefetches; a queued
+  prefetch that comes on screen is promoted. A plain value owned by the image
+  pipeline actor, so promotion can't race queuing. This is the "queue and
+  concurrency" evidence. (Replaced a FIFO `RequestLimiter` actor on 28 Nov; see
+  `DECISIONS.md`.)
 - **Image configuration**
   - `ImageConfigurationStore` fetches `/configuration` and persists it with a timestamp.
   - It refreshes when older than 7 days [Call; TMDB gives no interval [Fact]].
@@ -240,7 +243,7 @@ control" evidence.
   - Disk: a dedicated `URLSession` with `URLCache` (memory 20 MB / disk 200 MB [Call]).
   - Downsampling: ImageIO `CGImageSourceCreateThumbnailAtIndex` to the target
     pixel size [Fact: available on all four platforms; WWDC18-416].
-  - Bounded concurrency through `RequestLimiter`. `prefetch` and `cancelPrefetch` APIs.
+  - Bounded, prioritised concurrency through `RequestQueue`. `prefetch` and `cancelPrefetch` APIs.
   - Cancellation propagates to the download.
   - Returns `CGImage`.
 - **Favorites**

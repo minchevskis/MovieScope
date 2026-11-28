@@ -8,7 +8,7 @@ shows, and keeping local favorites, built on [The Movie Database (TMDB)](https:/
 - **MVVM**
 - A multi-platform **`MovieScopeCore`** framework (iOS, tvOS, macOS, visionOS)
 - Native `URLSession` networking
-- XCTest at **95% coverage** on the framework
+- XCTest at **97% coverage** on the framework
 
 | Trending | Details | Search | iPad |
 |---|---|---|---|
@@ -48,12 +48,12 @@ Notes:
 |---|---|
 | Trending movies in a collection view with a custom layout | `UICollectionView` with a custom compositional layout. A featured row of backdrop cards pages sideways; below it, a self-sizing poster grid fits as many columns as the width allows (2 on iPhone portrait, 4–7 on iPad). |
 | Infinite scrolling | `PaginationController`. The next page loads 6 items from the end. Overlapping pages are de-duplicated by identity, only one request runs at a time, a failed page shows Try Again in a footer (a failed refresh retries as a refresh), and paging stops at TMDB's 500-page limit. |
-| Title, image and short description | Each card shows the poster, rating badge, title (2 lines) and overview (3 lines). |
+| Title, image and short description | Grid cards show the poster, rating badge, title (2 lines) and overview (3 lines). Featured cards show the backdrop, title, a one-line overview and the rating. |
 | Details screen with extended content | A scrollable SwiftUI screen for **movies and TV shows**:<br>• backdrop, poster, tagline, year, runtime or seasons/episodes, genres<br>• rating and vote count<br>• overview<br>• directors and writers (movies) or creators (TV): the brief's "authors"<br>• cast<br>• up to 3 reviews with their authors<br>• status, language, budget/revenue or networks |
 | Search movies and series, kind chosen in advance, throttleable | `.searchable` with a **Movies / TV Shows** scope that is shown as soon as search opens. Queries are **throttled**: the first fires immediately, then at most one per 400 ms, always ending with the latest text. Older requests are cancelled and their late responses dropped. |
 | Images fetched based on view size | Every image requests the smallest TMDB size that covers its **rendered size in pixels** (points × screen scale, accounting for aspect-fill), then is downsampled to that size. |
 | Bonus: local favorites with an indicator | Heart in Details, a badge on cards and search rows, a long-press menu on Trending, and a Favorites tab. Stored in a JSON file owned by an actor; works offline. |
-| Bonus: pre-cache via concurrent/queued download | Collection view prefetching feeds the image pipeline, which allows at most 6 downloads at once (`RequestLimiter`). |
+| Bonus: pre-cache via concurrent/queued download | Collection view prefetching feeds the image pipeline, which runs at most 6 downloads at once. Images on screen go before prefetches, and a queued prefetch that comes on screen moves up the line (`RequestQueue`). |
 | Bonus: low-res image before the final one | Details shows the poster already cached from the grid instantly, then cross-fades to the full-size image. |
 | Bonus: image caching | Decoded images in an actor-owned memory cache, plus a dedicated `URLCache` on disk (20 MB memory, 200 MB disk). |
 | Bonus: `.xcframework` core | `Scripts/build-xcframework.sh` builds `MovieScopeCore.xcframework` with 7 slices (see [XCFramework](#xcframework)). |
@@ -77,7 +77,7 @@ flowchart TB
         Transport["HTTPTransport protocol<br/>URLSessionTransport · FixtureTransport"]
         Pagination["PaginationController&lt;Item&gt;<br/>PaginatedCollection&lt;Item&gt;"]
         Throttle["Throttler&lt;Value&gt;"]
-        Images["ImagePipeline (actor)<br/>RequestLimiter (actor) · ImageConfigurationStore (actor)"]
+        Images["ImagePipeline (actor) · RequestQueue<br/>ImageConfigurationStore (actor)"]
         Favorites["FavoritesStore (actor)"]
         Service --> Transport
         Images --> Transport
@@ -123,7 +123,6 @@ Every target uses Swift 6 language mode, so data-race safety is checked at compi
 
 **Shared mutable state lives in actors:**
 - `ImagePipeline`
-- `RequestLimiter`
 - `ImageConfigurationStore`
 - `FavoritesStore`
 
@@ -134,7 +133,7 @@ Every target uses Swift 6 language mode, so data-race safety is checked at compi
 **Cancellation is end to end:**
 - Leaving a details screen cancels its request (`.task`).
 - Reused cells cancel their image loads.
-- The last caller giving up on an image cancels its download.
+- The last caller giving up on an image cancels its download, or takes it out of the line if it hasn't started.
 - A new search cancels the previous one.
 
 ## Networking, images and caching
@@ -153,7 +152,9 @@ Every target uses Swift 6 language mode, so data-race safety is checked at compi
 **Images:**
 - **Size selection:** `ImageSizeSelector` picks the smallest `wNNN` size at least as wide as the rendered pixels. It ignores height-based tokens (`h632`) and never picks `original`. Size lists come from `/configuration`, cached for 7 days, with a built-in fallback.
 - **De-duplication:** concurrent requests for the same image share one download.
-- **Prefetching:** prefetches use the exact size cells render at, so they hit the same cache entries.
+- **Priority:** images on screen download before prefetches, and a queued prefetch that comes on screen is promoted. The queue lives inside the pipeline actor, so a promotion can't race the download it moves.
+- **Prefetching:** prefetches use the exact size cells render at, so they hit the same cache entries. Prefetch and cancel requests are applied in the order they were made.
+- **Preview index:** the record of which sizes of each file are in memory drops entries the memory cache has evicted, so it can't grow without bound.
 - **Offline:** if `/configuration` can't be fetched, the store backs off for a minute instead of retrying on every image load.
 - **Reused cells:** cancellation plus a key check stop a slow image from landing in a reused cell.
 
@@ -188,11 +189,11 @@ Dev builds also accept a `TMDB_ACCESS_TOKEN` environment variable, from a local 
 
 | Target | Tests | What they cover |
 |---|---|---|
-| `MovieScopeCoreTests` | 122 | Networking (URL building, encoding, status mapping, retry, cancellation, URLSession via a `URLProtocol` stub), decoding of captured TMDB fixtures, DTO mapping edge cases, pagination, throttling, image sizing/configuration/pipeline/limiter, favorites persistence |
-| `MovieScopeTests` | 75 | View models (Trending, Details, Search including stale first and next pages, Favorites including failed saves during fast taps), the reused-cell image protection, refreshed cells, card placeholders, Reduce Motion, layout math, snapshot building, formatters, composition root |
-| `MovieScopeUITests` | 11 | Trending with page 2, a failing page 2 and retry, and rotation, details, search with scope switch, favorites, setup screen, attribution, largest Dynamic Type, and one **recorded** flow |
+| `MovieScopeCoreTests` | 136 | Networking (URL building, encoding, status mapping, retry, cancellation, URLSession via a `URLProtocol` stub), decoding of captured TMDB fixtures, DTO mapping edge cases, pagination, throttling, image sizing, configuration, pipeline, download priority and preview index, favorites persistence |
+| `MovieScopeTests` | 78 | View models (Trending, Details, Search including stale first and next pages, Favorites including failed saves during fast taps), the reused-cell image protection, prefetch and cancel ordering, refreshed cells, card placeholders and descriptions, Reduce Motion, layout math, snapshot building, formatters, composition root |
+| `MovieScopeUITests` | 12 | Trending with page 2, a failing page 2 and retry, and rotation, details, search with scope switch, the scopes on every reopening of search, favorites, setup screen, attribution, largest Dynamic Type, and one **recorded** flow |
 
-- **Coverage:** **96.7% line coverage on `MovieScopeCore.framework`**. `./Scripts/coverage.sh` runs the unit tests and fails below 80%.
+- **Coverage:** **97.0% line coverage on `MovieScopeCore.framework`**. `./Scripts/coverage.sh` runs the unit tests and fails below 80%.
 - **Async tests** use `await fulfillment(of:)`.
 - **Inverted expectations** check things that must *not* happen: a stale result applied, a throttled call sent.
 - **Determinism:** time-based logic is driven by a controllable `Sleeper` (`TestSupport/ControlledSleeper.swift`) instead of real delays.
@@ -230,17 +231,19 @@ Dev builds also accept a `TMDB_ACCESS_TOKEN` environment variable, from a local 
 
 ## Known limitations and next steps
 
-**Offline mode for Trending, Details and Search is deferred** to protect the core scope within the time-box. Favorites and already-cached images work offline today. The planned design:
+**Offline mode for Trending, Details and Search is the one unfinished feature.** It was deferred to protect the core scope within the time-box. Favorites and already-cached images work offline today. The planned design:
 
 1. Persist the last fetched trending pages and opened details as timestamped JSON snapshots, keyed by request.
 2. When a request fails for connectivity reasons, serve the snapshot and show a "Showing saved results from …" banner.
 3. Purge snapshots after 30 days. TMDB's terms cap caching TMDB content at 6 months.
 4. Keep search online-only, with a clear offline message.
+5. Apply the same retention rule to the image disk cache. Today it follows TMDB's CDN cache headers, which allow about a year.
 
-**Smaller items:**
-- **Fixture details data:** in test data mode every movie opens the same details fixture (and every TV show the same TV fixture).
-- **Image cache retention:** the image disk cache honours TMDB's long CDN cache headers. A production app would also enforce the 6-month retention limit.
-- **The token is embedded in the app.** A backend proxy is the production path.
+**Scope decisions (not unfinished work):**
+- **Other platforms:** the Core framework builds for tvOS, macOS and visionOS and ships as an xcframework (see [XCFramework](#xcframework)), as the brief's bonus asks. Apps with their own interfaces for those platforms are out of scope.
+- **API token:** it is embedded in the app, an accepted trade-off for a read-only key to public data. The production path is a backend proxy (see [Environments, schemes and secrets](#environments-schemes-and-secrets)).
+
+**Test data:** in test data mode every movie opens the same details fixture (and every TV show the same TV fixture).
 
 ## Project documents
 
