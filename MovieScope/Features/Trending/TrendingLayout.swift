@@ -119,8 +119,12 @@ enum TrendingLayout {
 enum TrendingSnapshotBuilder {
     static let featuredCount = 5
 
+    /// - Parameter previous: what each title showed before. Titles whose
+    ///   content changed (a refresh with a new rating, say) are marked for
+    ///   reconfiguring: identifiers alone can't tell the data source.
     static func snapshot(
         for items: [MediaSummary],
+        previous: [MediaID: MediaSummary] = [:],
         featuredCount: Int = featuredCount
     ) -> NSDiffableDataSourceSnapshot<TrendingSection, MediaID> {
         var snapshot = NSDiffableDataSourceSnapshot<TrendingSection, MediaID>()
@@ -134,6 +138,8 @@ enum TrendingSnapshotBuilder {
             snapshot.appendSections([.grid])
             snapshot.appendItems(grid, toSection: .grid)
         }
+        let changed = items.filter { item in previous[item.id].map { $0 != item } ?? false }
+        snapshot.reconfigureItems(changed.map(\.id))
         return snapshot
     }
 }

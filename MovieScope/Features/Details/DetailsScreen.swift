@@ -1,20 +1,11 @@
 import MovieScopeCore
 import SwiftUI
 
-/// Scrollable details for a movie or TV show.
+/// Scrollable details for a movie or TV show. The view model comes from the
+/// screen that pushed it, which created it when the title was tapped.
 struct DetailsScreen<Accessory: View>: View {
-    @State private var viewModel: DetailsViewModel
+    let viewModel: DetailsViewModel
     @ViewBuilder let accessory: (MediaSummary) -> Accessory
-
-    init(
-        id: MediaID,
-        placeholder: MediaSummary?,
-        service: any TMDBService,
-        @ViewBuilder accessory: @escaping (MediaSummary) -> Accessory
-    ) {
-        _viewModel = State(initialValue: DetailsViewModel(id: id, placeholder: placeholder, service: service))
-        self.accessory = accessory
-    }
 
     var body: some View {
         ScrollView {
@@ -54,8 +45,8 @@ struct DetailsScreen<Accessory: View>: View {
 }
 
 extension DetailsScreen where Accessory == EmptyView {
-    init(id: MediaID, placeholder: MediaSummary?, service: any TMDBService) {
-        self.init(id: id, placeholder: placeholder, service: service) { _ in EmptyView() }
+    init(viewModel: DetailsViewModel) {
+        self.init(viewModel: viewModel) { _ in EmptyView() }
     }
 }
 

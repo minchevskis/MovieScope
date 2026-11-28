@@ -92,6 +92,7 @@ flowchart TB
 **Pattern: MVVM with constructor injection.**
 - View models depend on protocols (`TMDBService`, `HTTPTransport`, `FavoritesStoring`, `Sleeper`), never on concrete types.
 - One composition root wires everything; tests pass in fakes. No DI library.
+- View models are created on events, never in a view's initializer (which SwiftUI re-runs on every redraw): the tab screens' view models at launch, a details view model when a title is tapped.
 
 **Access control.**
 - `MovieScopeCore` exposes a small `public` surface.
@@ -187,11 +188,11 @@ Dev builds also accept a `TMDB_ACCESS_TOKEN` environment variable, from a local 
 
 | Target | Tests | What they cover |
 |---|---|---|
-| `MovieScopeCoreTests` | 117 | Networking (URL building, encoding, status mapping, retry, cancellation, URLSession via a `URLProtocol` stub), decoding of captured TMDB fixtures, DTO mapping edge cases, pagination, throttling, image sizing/configuration/pipeline/limiter, favorites persistence |
-| `MovieScopeTests` | 60 | View models (Trending, Details, Search including stale first and next pages, Favorites), the reused-cell image protection, layout math, snapshot building, formatters, composition root |
+| `MovieScopeCoreTests` | 122 | Networking (URL building, encoding, status mapping, retry, cancellation, URLSession via a `URLProtocol` stub), decoding of captured TMDB fixtures, DTO mapping edge cases, pagination, throttling, image sizing/configuration/pipeline/limiter, favorites persistence |
+| `MovieScopeTests` | 75 | View models (Trending, Details, Search including stale first and next pages, Favorites including failed saves during fast taps), the reused-cell image protection, refreshed cells, card placeholders, Reduce Motion, layout math, snapshot building, formatters, composition root |
 | `MovieScopeUITests` | 11 | Trending with page 2, a failing page 2 and retry, and rotation, details, search with scope switch, favorites, setup screen, attribution, largest Dynamic Type, and one **recorded** flow |
 
-- **Coverage:** **95.6% line coverage on `MovieScopeCore.framework`**. `./Scripts/coverage.sh` runs the unit tests and fails below 80%.
+- **Coverage:** **96.7% line coverage on `MovieScopeCore.framework`**. `./Scripts/coverage.sh` runs the unit tests and fails below 80%.
 - **Async tests** use `await fulfillment(of:)`.
 - **Inverted expectations** check things that must *not* happen: a stale result applied, a throttled call sent.
 - **Determinism:** time-based logic is driven by a controllable `Sleeper` (`TestSupport/ControlledSleeper.swift`) instead of real delays.
@@ -219,6 +220,7 @@ Dev builds also accept a `TMDB_ACCESS_TOKEN` environment variable, from a local 
 
 - **Dynamic Type everywhere.** At accessibility sizes the grid switches to one column and the details header stacks vertically. A UI test renders both screens at the largest size.
 - **VoiceOver:** cards read as "Title, rated 7.8 out of 10, favorite"; section titles are headers; images are decorative.
+- **Reduce Motion:** pressed cards dim instead of shrinking, the favorite heart doesn't bounce, and reviews expand without animation. Cross-fades stay, as Apple's guidelines suggest.
 - **iPhone and iPad, portrait and landscape:**
   - The tab bar becomes a sidebar or top bar on iPad.
   - The grid adapts its columns to any width.

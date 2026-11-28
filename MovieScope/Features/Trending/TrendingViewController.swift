@@ -60,12 +60,14 @@ final class TrendingViewController: UIViewController {
     /// Applies new state from SwiftUI. Cheap when nothing changed.
     func update(items: [MediaSummary], phase: LoadPhase, favorites: Set<MediaID>) {
         let ids = items.map(\.id)
-        if ids != orderedIDs {
+        // Same titles can come back with new content (a refresh with new ratings).
+        if ids != orderedIDs || items.contains(where: { itemsByID[$0.id] != $0 }) {
+            let snapshot = TrendingSnapshotBuilder.snapshot(for: items, previous: itemsByID)
             itemsByID = Dictionary(items.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
             indexByID = Dictionary(ids.enumerated().map { ($1, $0) }, uniquingKeysWith: { first, _ in first })
             let isFirstLoad = orderedIDs.isEmpty
             orderedIDs = ids
-            dataSource.apply(TrendingSnapshotBuilder.snapshot(for: items), animatingDifferences: !isFirstLoad)
+            dataSource.apply(snapshot, animatingDifferences: !isFirstLoad)
         }
         if favorites != self.favorites {
             let changed = favorites.symmetricDifference(self.favorites)

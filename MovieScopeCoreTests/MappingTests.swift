@@ -46,6 +46,42 @@ final class MappingTests: XCTestCase {
         XCTAssertNotNil(summary.releaseDate)
     }
 
+    func test_map_tvEmptyFirstAirDate_isNil() throws {
+        let item = try FixtureLoader.decode(MediaListItemDTO.self, json: """
+        {"id": 9, "name": "Upcoming Show", "first_air_date": ""}
+        """)
+        let details = try FixtureLoader.decode(TVDetailsDTO.self, json: """
+        {"id": 9, "name": "Upcoming Show", "first_air_date": ""}
+        """).toDetails()
+
+        XCTAssertNil(item.toSummary(kind: .tv).releaseDate)
+        XCTAssertNil(details.summary.releaseDate)
+    }
+
+    func test_map_nullProfilePaths_areNil() throws {
+        let details = try FixtureLoader.decode(TVDetailsDTO.self, json: """
+        {"id": 9, "name": "Show",
+         "created_by": [{"id": 1, "name": "Creator", "profile_path": null}],
+         "credits": {
+           "cast": [{"id": 2, "name": "Actor", "character": "Lead", "profile_path": null, "order": 0}],
+           "crew": []
+         }}
+        """).toDetails()
+        let credits = try FixtureLoader.decode(CreditsDTO.self, json: """
+        {"cast": [], "crew": [
+          {"id": 3, "name": "Director", "job": "Director", "department": "Directing", "profile_path": null},
+          {"id": 4, "name": "Writer", "job": "Writer", "department": "Writing", "profile_path": ""}
+        ]}
+        """)
+
+        XCTAssertEqual(details.creators.map(\.name), ["Creator"])
+        XCTAssertNil(details.creators.first?.profilePath)
+        XCTAssertEqual(details.cast.map(\.person.name), ["Actor"])
+        XCTAssertNil(details.cast.first?.person.profilePath)
+        XCTAssertNil(credits.directors.first?.profilePath)
+        XCTAssertNil(credits.writers.first?.profilePath, "An empty path counts as no photo")
+    }
+
     func test_map_directorsAndDedupedWriters() throws {
         let credits = try FixtureLoader.decode(CreditsDTO.self, json: """
         {"cast": [], "crew": [

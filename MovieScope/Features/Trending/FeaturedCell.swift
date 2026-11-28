@@ -6,6 +6,7 @@ final class FeaturedCell: UICollectionViewCell {
     static let reuseIdentifier = "FeaturedCell"
 
     private let backdropView = SizeReportingImageView()
+    private let placeholderView = ArtworkPlaceholderView()
     private let gradientLayer = CAGradientLayer()
     private let titleLabel = UILabel()
     private let ratingBadge = RatingBadgeView()
@@ -91,7 +92,8 @@ final class FeaturedCell: UICollectionViewCell {
         favoriteBadge.isHidden = true
         favoriteBadge.preferredSymbolConfiguration = .init(textStyle: .title3)
 
-        for view in [backdropView, titleLabel, ratingBadge, favoriteBadge] {
+        // Back to front: placeholder symbol, backdrop (covers it once loaded), text and badges.
+        for view in [placeholderView, backdropView, titleLabel, ratingBadge, favoriteBadge] {
             view.translatesAutoresizingMaskIntoConstraints = false
             contentView.addSubview(view)
         }
@@ -102,6 +104,10 @@ final class FeaturedCell: UICollectionViewCell {
             backdropView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             backdropView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             backdropView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            placeholderView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            placeholderView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: -16),
+            placeholderView.widthAnchor.constraint(equalToConstant: 44),
+            placeholderView.heightAnchor.constraint(equalToConstant: 44),
             titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: ratingBadge.leadingAnchor, constant: -12),
             titleLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -14),

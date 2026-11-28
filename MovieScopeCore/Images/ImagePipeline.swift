@@ -130,10 +130,14 @@ public actor ImagePipeline {
             memoryCache.setObject(image, forKey: Self.cacheKey(for: request), cost: image.bytesPerRow * image.height)
             variantsByFile[request.url.lastPathComponent, default: []].insert(request)
         }
-        if inFlight[request]?.id == id {
-            inFlight[request] = nil
+        // Only the download that is still current may clear the bookkeeping: a
+        // cancelled one can finish after a new prefetch of the same image started,
+        // and must not orphan that prefetch (it could no longer be cancelled).
+        guard let entry = inFlight[request], entry.id == id else { return }
+        inFlight[request] = nil
+        if let waiter = prefetchWaiters[request], entry.waiters.contains(waiter) {
+            prefetchWaiters[request] = nil
         }
-        prefetchWaiters[request] = nil
     }
 
     // MARK: - Loading (off the actor)

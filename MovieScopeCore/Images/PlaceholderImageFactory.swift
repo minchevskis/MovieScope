@@ -5,8 +5,8 @@ import UniformTypeIdentifiers
 
 /// Generates deterministic PNG images: test data for the image pipeline and the
 /// artwork served by `FixtureTransport` in UI-test mode. No binary assets needed.
-public enum PlaceholderImageFactory {
-    public static func pngData(width: Int, height: Int, seed: Int = 0) -> Data {
+enum PlaceholderImageFactory {
+    static func pngData(width: Int, height: Int, seed: Int = 0) -> Data {
         let colorSpace = CGColorSpace(name: CGColorSpace.sRGB) ?? CGColorSpaceCreateDeviceRGB()
         guard let context = CGContext(
             data: nil,

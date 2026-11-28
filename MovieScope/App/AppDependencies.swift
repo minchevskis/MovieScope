@@ -10,6 +10,11 @@ final class AppDependencies {
     let imageProvider: ImageProvider
     let favorites: FavoritesModel
     let hasCredentials: Bool
+    /// The tab screens' view models live as long as the app, so they are built
+    /// here, once. Built in a view's initializer instead, they would be rebuilt
+    /// (and thrown away) every time SwiftUI re-creates that view.
+    let trending: TrendingViewModel
+    let search: SearchViewModel
 
     init(environment: AppEnvironment, bundle: Bundle = .main) {
         self.environment = environment
@@ -30,8 +35,8 @@ final class AppDependencies {
             imageTransport = fixtures
         } else {
             credentials = environment.forcesMissingToken ? StaticCredentialProvider(nil) : Self.liveCredentials(bundle)
-            apiTransport = URLSessionTransport(session: .api)
-            imageTransport = URLSessionTransport(session: .images)
+            apiTransport = URLSessionTransport.api
+            imageTransport = URLSessionTransport.images
         }
 
         let client = TMDBClient(
@@ -41,6 +46,8 @@ final class AppDependencies {
         )
         service = client
         hasCredentials = credentials.accessToken() != nil
+        trending = TrendingViewModel(service: client)
+        search = SearchViewModel(service: client)
         favorites = FavoritesModel(
             store: FavoritesStore(fileURL: Self.supportDirectory.appendingPathComponent("favorites.json"))
         )
@@ -51,6 +58,12 @@ final class AppDependencies {
                 fileURL: Self.supportDirectory.appendingPathComponent("image-configuration.json")
             )
         )
+    }
+
+    /// The view model for a tapped title's details. Screens call this when the
+    /// title is tapped, so each push builds exactly one.
+    func makeDetails(for summary: MediaSummary) -> DetailsViewModel {
+        DetailsViewModel(id: summary.id, placeholder: summary, service: service)
     }
 
     /// Dev builds also accept a token from the Xcode scheme's environment;

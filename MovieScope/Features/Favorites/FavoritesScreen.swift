@@ -4,16 +4,18 @@ import SwiftUI
 /// Saved favorites. Works offline: everything shown is stored locally, and
 /// posters come from the image cache when available.
 struct FavoritesScreen<Destination: View>: View {
-    @ViewBuilder let destination: (MediaSummary) -> Destination
+    /// Builds the details view model when a favorite is tapped.
+    let makeDetails: (MediaSummary) -> DetailsViewModel
+    @ViewBuilder let destination: (DetailsViewModel) -> Destination
 
     @Environment(FavoritesModel.self) private var favorites
-    @State private var selection: MediaSummary?
+    @State private var selection: DetailsViewModel?
 
     var body: some View {
         content
             .navigationTitle("Favorites")
-            .navigationDestination(item: $selection) { summary in
-                destination(summary)
+            .navigationDestination(item: $selection) { details in
+                destination(details)
             }
     }
 
@@ -31,7 +33,7 @@ struct FavoritesScreen<Destination: View>: View {
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 16)], spacing: 20) {
                     ForEach(Array(favorites.items.enumerated()), id: \.element.id) { index, item in
                         Button {
-                            selection = item.summary
+                            selection = makeDetails(item.summary)
                         } label: {
                             FavoriteCard(item: item)
                         }
@@ -79,6 +81,7 @@ struct FavoriteButton: View {
     let summary: MediaSummary
 
     @Environment(FavoritesModel.self) private var favorites
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         let isFavorite = favorites.isFavorite(summary.id)
@@ -90,6 +93,7 @@ struct FavoriteButton: View {
                 systemImage: isFavorite ? "heart.fill" : "heart"
             )
             .symbolEffect(.bounce, value: isFavorite)
+            .symbolEffectsRemoved(reduceMotion)
         }
         .tint(isFavorite ? .pink : nil)
         .accessibilityIdentifier(AccessibilityID.Details.favoriteButton)

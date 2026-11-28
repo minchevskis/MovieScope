@@ -32,7 +32,7 @@ public struct TMDBClient: Sendable {
         self.logsRequests = logsRequests
     }
 
-    public func send<Response>(_ endpoint: Endpoint<Response>) async throws -> Response {
+    func send<Response>(_ endpoint: Endpoint<Response>) async throws -> Response {
         guard let token = credentials.accessToken() else {
             throw APIError.missingCredentials
         }

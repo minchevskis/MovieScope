@@ -19,10 +19,11 @@ struct RootView: View {
             Tab("Trending", systemImage: "flame") {
                 NavigationStack {
                     TrendingScreen(
-                        service: dependencies.service,
+                        viewModel: dependencies.trending,
                         imageProvider: dependencies.imageProvider,
                         favorites: dependencies.favorites.ids,
                         onToggleFavorite: toggleFavorite,
+                        makeDetails: dependencies.makeDetails(for:),
                         destination: details
                     )
                     .aboutToolbar()
@@ -33,8 +34,9 @@ struct RootView: View {
             Tab("Search", systemImage: "magnifyingglass", role: .search) {
                 NavigationStack {
                     SearchScreen(
-                        service: dependencies.service,
+                        viewModel: dependencies.search,
                         favorites: dependencies.favorites.ids,
+                        makeDetails: dependencies.makeDetails(for:),
                         destination: details
                     )
                     .aboutToolbar()
@@ -44,7 +46,7 @@ struct RootView: View {
 
             Tab("Favorites", systemImage: "heart") {
                 NavigationStack {
-                    FavoritesScreen(destination: details)
+                    FavoritesScreen(makeDetails: dependencies.makeDetails(for:), destination: details)
                         .aboutToolbar()
                 }
             }
@@ -53,8 +55,8 @@ struct RootView: View {
         .tabViewStyle(.sidebarAdaptable)
     }
 
-    private func details(for summary: MediaSummary) -> some View {
-        DetailsScreen(id: summary.id, placeholder: summary, service: dependencies.service) { summary in
+    private func details(_ viewModel: DetailsViewModel) -> some View {
+        DetailsScreen(viewModel: viewModel) { summary in
             FavoriteButton(summary: summary)
         }
     }

@@ -56,6 +56,18 @@ final class DetailsViewModel {
     }
 }
 
+/// Equal only to itself: each push is its own navigation target, even when
+/// the same title is opened twice.
+extension DetailsViewModel: Hashable {
+    nonisolated static func == (lhs: DetailsViewModel, rhs: DetailsViewModel) -> Bool {
+        lhs === rhs
+    }
+
+    nonisolated func hash(into hasher: inout Hasher) {
+        hasher.combine(ObjectIdentifier(self))
+    }
+}
+
 /// Text built from details for the header.
 nonisolated enum DetailsFormatting {
     /// "2024 · 2h 15m · Action, Sci-Fi" for movies; "5 seasons · 62 episodes" for TV.

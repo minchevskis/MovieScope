@@ -97,6 +97,7 @@ struct ReviewsSection: View {
 private struct ReviewCard: View {
     let review: Review
     @State private var isExpanded = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -113,7 +114,7 @@ private struct ReviewCard: View {
                 .font(.callout)
                 .lineLimit(isExpanded ? nil : 4)
             Button(isExpanded ? "Show less" : "Read more") {
-                withAnimation(.snappy) { isExpanded.toggle() }
+                withAnimation(Motion.animation(.snappy, reduceMotion: reduceMotion)) { isExpanded.toggle() }
             }
             .font(.caption.weight(.semibold))
         }

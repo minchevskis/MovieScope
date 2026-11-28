@@ -4,23 +4,15 @@ import SwiftUI
 /// Search movies or TV shows. The Movies / TV Shows scope appears as soon as
 /// the search field is focused, so the kind can be chosen before typing.
 struct SearchScreen<Destination: View>: View {
-    let favorites: Set<MediaID>
-    @ViewBuilder let destination: (MediaSummary) -> Destination
+    @Bindable var viewModel: SearchViewModel
+    var favorites: Set<MediaID> = []
+    /// Builds the details view model when a result is tapped.
+    let makeDetails: (MediaSummary) -> DetailsViewModel
+    @ViewBuilder let destination: (DetailsViewModel) -> Destination
 
-    @State private var viewModel: SearchViewModel
-    @State private var selection: MediaSummary?
+    @State private var selection: DetailsViewModel?
     @State private var isSearchPresented = false
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-
-    init(
-        service: any TMDBService,
-        favorites: Set<MediaID> = [],
-        @ViewBuilder destination: @escaping (MediaSummary) -> Destination
-    ) {
-        self.favorites = favorites
-        self.destination = destination
-        _viewModel = State(initialValue: SearchViewModel(service: service))
-    }
 
     var body: some View {
         content
@@ -35,8 +27,8 @@ struct SearchScreen<Destination: View>: View {
                 Text("Movies").tag(MediaKind.movie)
                 Text("TV Shows").tag(MediaKind.tv)
             }
-            .navigationDestination(item: $selection) { summary in
-                destination(summary)
+            .navigationDestination(item: $selection) { details in
+                destination(details)
             }
             // A dedicated search tab opens ready to type, with the scopes visible
             // (iPadOS otherwise collapses the field into a toolbar button).
@@ -76,7 +68,7 @@ struct SearchScreen<Destination: View>: View {
         List {
             ForEach(Array(viewModel.items.enumerated()), id: \.element.id) { index, summary in
                 Button {
-                    selection = summary
+                    selection = makeDetails(summary)
                 } label: {
                     SearchResultRow(summary: summary, isFavorite: favorites.contains(summary.id))
                 }

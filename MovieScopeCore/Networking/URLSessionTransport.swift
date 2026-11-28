@@ -18,20 +18,29 @@ public struct URLSessionTransport: HTTPTransport {
     }
 }
 
+extension URLSessionTransport {
+    /// Transport for TMDB API calls. No response cache: search queries must
+    /// not be persisted on disk, and a refresh must always hit the network.
+    public static let api = URLSessionTransport(session: .api)
+
+    /// Transport for image downloads, with a dedicated disk cache.
+    public static let images = URLSessionTransport(session: .images)
+}
+
 extension URLSession {
-    /// Session for API calls. No response cache: search queries must not be
-    /// persisted on disk, and a refresh must always hit the network.
-    public static let api: URLSession = {
+    /// Session behind `URLSessionTransport.api`.
+    static let api: URLSession = {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.urlCache = nil
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
         return URLSession(configuration: configuration)
     }()
 
-    /// Session for image downloads with its own `URLCache` (20 MB memory, 200 MB disk).
-    /// TMDB's image CDN sends long-lived `Cache-Control` headers, so this cache
-    /// serves repeat images without hitting the network.
-    public static let images: URLSession = {
+    /// Session behind `URLSessionTransport.images`, with its own `URLCache`
+    /// (20 MB memory, 200 MB disk). TMDB's image CDN sends long-lived
+    /// `Cache-Control` headers, so this cache serves repeat images without
+    /// hitting the network.
+    static let images: URLSession = {
         let configuration = URLSessionConfiguration.default
         configuration.urlCache = URLCache(
             memoryCapacity: 20 * 1024 * 1024,

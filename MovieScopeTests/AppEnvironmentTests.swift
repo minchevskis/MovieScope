@@ -58,4 +58,24 @@ final class AppDependenciesTests: XCTestCase {
 
         XCTAssertFalse(sut.hasCredentials)
     }
+
+    func test_makeDetails_startsFromTheTappedTitle() async {
+        let sut = AppDependencies(environment: AppEnvironment(processEnvironment: ["MOVIESCOPE_FIXTURES": "1"]))
+        let tapped = MediaSummary.stub(550)
+
+        let details = sut.makeDetails(for: tapped)
+
+        XCTAssertEqual(details.id, tapped.id)
+        XCTAssertEqual(details.summary, tapped, "Shows what the list knew while the details load")
+    }
+
+    func test_detailsViewModels_areDistinctNavigationTargets() {
+        let sut = AppDependencies(environment: AppEnvironment(processEnvironment: ["MOVIESCOPE_FIXTURES": "1"]))
+        let first = sut.makeDetails(for: .stub(1))
+        let again = sut.makeDetails(for: .stub(1))
+
+        XCTAssertEqual(first, first)
+        XCTAssertNotEqual(first, again, "Tapping the same title twice is two separate pushes")
+        XCTAssertEqual(Set([first, again, first]).count, 2)
+    }
 }

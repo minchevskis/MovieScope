@@ -18,18 +18,19 @@ public struct FavoriteItem: Codable, Hashable, Sendable, Identifiable {
     }
 
     public init(summary: MediaSummary, addedAt: Date) {
-        var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = TimeZone(identifier: "UTC") ?? .current
         self.init(
             id: summary.id,
             title: summary.title,
             posterPath: summary.posterPath,
-            year: summary.releaseDate.map { calendar.component(.year, from: $0) },
+            year: summary.releaseDate.map { Self.utcCalendar.component(.year, from: $0) },
             addedAt: addedAt
         )
     }
 
     /// A list-level summary, used as the details placeholder while it loads.
+    /// Only the year is stored, so the release date is 1 January of that year
+    /// (in UTC, like every TMDB date). The app only ever shows its year, and
+    /// re-adding the favorite from this placeholder keeps the year.
     public var summary: MediaSummary {
         MediaSummary(
             id: id,
@@ -39,22 +40,28 @@ public struct FavoriteItem: Codable, Hashable, Sendable, Identifiable {
             backdropPath: nil,
             voteAverage: 0,
             voteCount: 0,
-            releaseDate: nil
+            releaseDate: year.flatMap { Self.utcCalendar.date(from: DateComponents(year: $0, month: 1, day: 1)) }
         )
     }
+
+    private static let utcCalendar: Calendar = {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "UTC") ?? .gmt
+        return calendar
+    }()
 }
 
 public protocol FavoritesStoring: Sendable {
     /// All favorites, newest first.
     func all() async -> [FavoriteItem]
-    /// Adds the item if absent, removes it if present. Returns `true` when it
-    /// is a favorite afterwards.
-    @discardableResult
-    func toggle(_ item: FavoriteItem) async throws -> Bool
+    /// Saves `item` as a favorite, or removes it. It states the wanted result
+    /// instead of flipping the current one, so it is safe to repeat, and a save
+    /// that follows a failed one can't invert it.
+    func set(_ item: FavoriteItem, isFavorite: Bool) async throws
 }
 
 /// Persists favorites as one JSON file. The actor serializes every read and
-/// write, so concurrent toggles can't lose updates. A corrupt file is treated
+/// write, so concurrent saves can't lose updates. A corrupt file is treated
 /// as empty (and replaced on the next save) rather than crashing the app.
 public actor FavoritesStore: FavoritesStoring {
     private let fileURL: URL
@@ -68,20 +75,18 @@ public actor FavoritesStore: FavoritesStoring {
         loaded().sorted { $0.addedAt > $1.addedAt }
     }
 
-    @discardableResult
-    public func toggle(_ item: FavoriteItem) throws -> Bool {
+    public func set(_ item: FavoriteItem, isFavorite: Bool) throws {
         var items = loaded()
-        let isFavorite: Bool
-        if let index = items.firstIndex(where: { $0.id == item.id }) {
-            items.remove(at: index)
-            isFavorite = false
-        } else {
+        switch (items.firstIndex { $0.id == item.id }, isFavorite) {
+        case (nil, true):
             items.append(item)
-            isFavorite = true
+        case let (index?, false):
+            items.remove(at: index)
+        default:
+            return // Already as wanted; an existing favorite keeps its date.
         }
         try save(items)
         cache = items
-        return isFavorite
     }
 
     private func loaded() -> [FavoriteItem] {

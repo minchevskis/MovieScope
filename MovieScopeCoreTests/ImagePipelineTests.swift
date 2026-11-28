@@ -99,6 +99,26 @@ final class ImagePipelineTests: XCTestCase {
         XCTAssertNil(cached)
     }
 
+    func test_pipeline_cancelPrefetch_afterQuickRestart_cancelsNewDownload() async throws {
+        let transport = ControlledTransport()
+        let sut = ImagePipeline(transport: transport)
+        let request = ImageRequest(url: posterURL, maxPixelSize: 300)
+
+        // A row leaves the screen and comes back before its first download has wound down.
+        await sut.prefetch([request])
+        await transport.waitForRequests(1)
+        await sut.cancelPrefetch([request])
+        await sut.prefetch([request])
+        await transport.waitForRequests(2)
+        await transport.waitForCancellations(1)
+        // Let the first, cancelled download finish its bookkeeping.
+        try await Task.sleep(for: .milliseconds(100))
+
+        await sut.cancelPrefetch([request])
+
+        await transport.waitForCancellations(2)
+    }
+
     func test_pipeline_httpError_throws() async {
         let sut = ImagePipeline(transport: FakeTransport([.response(status: 404, body: Data())]))
 

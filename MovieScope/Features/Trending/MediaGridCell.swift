@@ -7,7 +7,7 @@ final class MediaGridCell: UICollectionViewCell {
     static let reuseIdentifier = "MediaGridCell"
 
     private let posterView = SizeReportingImageView()
-    private let placeholderView = UIImageView(image: UIImage(systemName: "film"))
+    private let placeholderView = ArtworkPlaceholderView()
     private let ratingBadge = RatingBadgeView()
     private let favoriteBadge = UIImageView(image: UIImage(systemName: "heart.fill"))
     private let titleLabel = UILabel()
@@ -65,8 +65,13 @@ final class MediaGridCell: UICollectionViewCell {
 
     override var isHighlighted: Bool {
         didSet {
+            let appearance = Motion.pressedAppearance(
+                isPressed: isHighlighted,
+                reduceMotion: UIAccessibility.isReduceMotionEnabled
+            )
             UIView.animate(withDuration: 0.15, delay: 0, options: [.allowUserInteraction, .beginFromCurrentState]) {
-                self.contentView.transform = self.isHighlighted ? CGAffineTransform(scaleX: 0.97, y: 0.97) : .identity
+                self.contentView.transform = appearance.transform
+                self.contentView.alpha = appearance.alpha
             }
         }
     }
@@ -80,8 +85,6 @@ final class MediaGridCell: UICollectionViewCell {
         posterView.contentMode = .scaleAspectFill
         posterView.clipsToBounds = true
         posterView.onLayout = { [weak self] in self?.loadPoster() }
-        placeholderView.tintColor = .tertiaryLabel
-        placeholderView.contentMode = .scaleAspectFit
 
         configureBadgesAndLabels()
 

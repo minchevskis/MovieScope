@@ -164,6 +164,39 @@ The full context is in `DESIGN.md`.
   - Dev request logging with header redaction is real
 - **Alternatives:** Shipping as reviewed.
 - **Reason:** The fixes were small and contained, and each was a case a
-  user or reviewer could plausibly hit. The remaining minor items are listed
-  in the build notes.
+  user or reviewer could plausibly hit. The minor items it also found were
+  fixed the next day (below).
+
+## 2026-11-28: The review's minor items
+- **Decision:** The seven minor findings were fixed too, each with a test
+  that failed first where the behaviour is observable:
+  - a cancelled image download that finishes late no longer orphans a newer
+    prefetch of the same image (it could no longer be cancelled)
+  - a refresh that returns the same titles with new content updates the
+    cards (identifiers alone don't tell the diffable data source)
+  - tab view models are built once in the composition root, and a details
+    view model when a title is tapped, instead of in view initializers that
+    SwiftUI re-runs on every redraw
+  - tests for an empty TV air date and missing profile photos; the featured
+    card shows a placeholder symbol like the grid card
+  - Reduce Motion: pressed cards dim instead of shrinking, the heart doesn't
+    bounce, reviews expand without animation; cross-fades stay
+  - `Endpoint`, `TMDBClient.send`, `PlaceholderImageFactory` and the
+    `URLSession` presets are internal; the app uses
+    `URLSessionTransport.api` and `.images`
+  - favorites: the store saves the wanted state instead of flipping it, and a
+    failed save puts back only its own title, and only if no newer tap on it
+    is pending; re-adding from a details screen that hasn't loaded keeps the year
+- **Alternatives:** Leaving them as documented minor issues.
+- **Reason:** Each was cheap to fix and test, and two (the favorites cases)
+  could leave the screen disagreeing with what is saved.
+- **Calls made:**
+  - `FixtureTransport` stays public: the app's fixture mode (UI tests, demos)
+    needs it.
+  - Favorites store only the year, so the placeholder summary built from a
+    favorite carries 1 January of that year (UTC). Only the year is ever
+    shown, and the year survives a remove and re-add.
+  - The view-model change is structural (no allocation left in any view
+    initializer), so it has no test that failed first; the tab and details
+    flows are covered by the existing UI tests.
 

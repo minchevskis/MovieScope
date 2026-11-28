@@ -11,24 +11,34 @@ final class FavoritesStoreTests: XCTestCase {
         XCTAssertTrue(items.isEmpty)
     }
 
-    func test_store_toggleAddsThenRemoves() async throws {
+    func test_store_setAddsThenRemoves() async throws {
         let sut = FavoritesStore(fileURL: temporaryFileURL())
         let item = favorite(1)
 
-        let added = try await sut.toggle(item)
+        try await sut.set(item, isFavorite: true)
         let afterAdd = await sut.all()
-        let removed = try await sut.toggle(item)
+        try await sut.set(item, isFavorite: false)
         let afterRemove = await sut.all()
 
-        XCTAssertTrue(added)
         XCTAssertEqual(afterAdd, [item])
-        XCTAssertFalse(removed)
         XCTAssertTrue(afterRemove.isEmpty)
+    }
+
+    func test_store_setIsSafeToRepeat() async throws {
+        let sut = FavoritesStore(fileURL: temporaryFileURL())
+        let original = favorite(1, addedAt: Date(timeIntervalSince1970: 100))
+
+        try await sut.set(original, isFavorite: true)
+        try await sut.set(favorite(1, addedAt: Date(timeIntervalSince1970: 900)), isFavorite: true)
+        try await sut.set(favorite(2), isFavorite: false)
+
+        let items = await sut.all()
+        XCTAssertEqual(items, [original], "Re-adding keeps one copy with its original date; removing an absent one is a no-op")
     }
 
     func test_store_persistsAcrossInstances() async throws {
         let fileURL = temporaryFileURL()
-        try await FavoritesStore(fileURL: fileURL).toggle(favorite(1))
+        try await FavoritesStore(fileURL: fileURL).set(favorite(1), isFavorite: true)
 
         let reloaded = await FavoritesStore(fileURL: fileURL).all()
 
@@ -43,7 +53,7 @@ final class FavoritesStoreTests: XCTestCase {
         let sut = FavoritesStore(fileURL: fileURL)
 
         let initial = await sut.all()
-        try await sut.toggle(favorite(2))
+        try await sut.set(favorite(2), isFavorite: true)
 
         XCTAssertTrue(initial.isEmpty)
         let reloaded = await FavoritesStore(fileURL: fileURL).all()
@@ -52,9 +62,9 @@ final class FavoritesStoreTests: XCTestCase {
 
     func test_store_allNewestFirst() async throws {
         let sut = FavoritesStore(fileURL: temporaryFileURL())
-        try await sut.toggle(favorite(1, addedAt: Date(timeIntervalSince1970: 100)))
-        try await sut.toggle(favorite(2, addedAt: Date(timeIntervalSince1970: 300)))
-        try await sut.toggle(favorite(3, addedAt: Date(timeIntervalSince1970: 200)))
+        try await sut.set(favorite(1, addedAt: Date(timeIntervalSince1970: 100)), isFavorite: true)
+        try await sut.set(favorite(2, addedAt: Date(timeIntervalSince1970: 300)), isFavorite: true)
+        try await sut.set(favorite(3, addedAt: Date(timeIntervalSince1970: 200)), isFavorite: true)
 
         let ids = await sut.all().map(\.id.id)
 
@@ -63,8 +73,8 @@ final class FavoritesStoreTests: XCTestCase {
 
     func test_store_movieAndTVWithSameNumber_areDistinct() async throws {
         let sut = FavoritesStore(fileURL: temporaryFileURL())
-        try await sut.toggle(favorite(7, kind: .movie))
-        try await sut.toggle(favorite(7, kind: .tv))
+        try await sut.set(favorite(7, kind: .movie), isFavorite: true)
+        try await sut.set(favorite(7, kind: .tv), isFavorite: true)
 
         let count = await sut.all().count
 
@@ -85,10 +95,26 @@ final class FavoritesStoreTests: XCTestCase {
         XCTAssertEqual(item.summary.title, "Show")
     }
 
+    func test_favoriteItem_placeholderSummary_keepsYear() {
+        // Removing a favorite and re-adding it from a details screen that hasn't
+        // loaded yet builds the new item from this placeholder.
+        let item = favorite(1)
+
+        let readded = FavoriteItem(summary: item.summary, addedAt: Date(timeIntervalSince1970: 50))
+
+        XCTAssertEqual(readded.year, 2024)
+        XCTAssertNil(favorite(2, year: nil).summary.releaseDate)
+    }
+
     // MARK: - Helpers
 
-    private func favorite(_ id: Int, kind: MediaKind = .movie, addedAt: Date = Date(timeIntervalSince1970: 0)) -> FavoriteItem {
-        FavoriteItem(id: MediaID(kind: kind, id: id), title: "Title \(id)", posterPath: "/p\(id).jpg", year: 2024, addedAt: addedAt)
+    private func favorite(
+        _ id: Int,
+        kind: MediaKind = .movie,
+        year: Int? = 2024,
+        addedAt: Date = Date(timeIntervalSince1970: 0)
+    ) -> FavoriteItem {
+        FavoriteItem(id: MediaID(kind: kind, id: id), title: "Title \(id)", posterPath: "/p\(id).jpg", year: year, addedAt: addedAt)
     }
 
     private func temporaryFileURL() -> URL {

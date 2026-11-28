@@ -135,6 +135,26 @@ final class TrendingSnapshotBuilderTests: XCTestCase {
         XCTAssertTrue(TrendingSnapshotBuilder.snapshot(for: []).sectionIdentifiers.isEmpty)
     }
 
+    func test_snapshot_reconfiguresTitlesWhoseContentChanged() {
+        let original = (0..<7).map { MediaSummary.stub($0) }
+        var refreshed = original
+        refreshed[1] = original[1].rated(9.1, votes: 500) // featured row
+        refreshed[6] = original[6].rated(3.2, votes: 80) // grid
+
+        let snapshot = TrendingSnapshotBuilder.snapshot(
+            for: refreshed,
+            previous: Dictionary(uniqueKeysWithValues: original.map { ($0.id, $0) })
+        )
+
+        XCTAssertEqual(Set(snapshot.reconfiguredItemIdentifiers), [original[1].id, original[6].id])
+    }
+
+    func test_snapshot_firstLoad_reconfiguresNothing() {
+        let snapshot = TrendingSnapshotBuilder.snapshot(for: (0..<7).map { MediaSummary.stub($0) }, previous: [:])
+
+        XCTAssertTrue(snapshot.reconfiguredItemIdentifiers.isEmpty)
+    }
+
     func test_snapshot_sameIDDifferentKind_areDistinct() {
         let items = [MediaSummary.stub(1, kind: .movie), MediaSummary.stub(1, kind: .tv)]
 

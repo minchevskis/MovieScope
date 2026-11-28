@@ -3,34 +3,22 @@ import SwiftUI
 
 /// Main screen: weekly trending movies.
 struct TrendingScreen<Destination: View>: View {
+    let viewModel: TrendingViewModel
     let imageProvider: ImageProvider
-    let favorites: Set<MediaID>
-    let onToggleFavorite: (MediaSummary) -> Void
-    @ViewBuilder let destination: (MediaSummary) -> Destination
+    var favorites: Set<MediaID> = []
+    var onToggleFavorite: (MediaSummary) -> Void = { _ in }
+    /// Builds the details view model when a title is tapped.
+    let makeDetails: (MediaSummary) -> DetailsViewModel
+    @ViewBuilder let destination: (DetailsViewModel) -> Destination
 
-    @State private var viewModel: TrendingViewModel
-    @State private var selection: MediaSummary?
-
-    init(
-        service: any TMDBService,
-        imageProvider: ImageProvider,
-        favorites: Set<MediaID> = [],
-        onToggleFavorite: @escaping (MediaSummary) -> Void = { _ in },
-        @ViewBuilder destination: @escaping (MediaSummary) -> Destination
-    ) {
-        self.imageProvider = imageProvider
-        self.favorites = favorites
-        self.onToggleFavorite = onToggleFavorite
-        self.destination = destination
-        _viewModel = State(initialValue: TrendingViewModel(service: service))
-    }
+    @State private var selection: DetailsViewModel?
 
     var body: some View {
         content
             .navigationTitle("Trending")
             .navigationBarTitleDisplayMode(.inline)
-            .navigationDestination(item: $selection) { summary in
-                destination(summary)
+            .navigationDestination(item: $selection) { details in
+                destination(details)
             }
             .task { await viewModel.onAppear() }
     }
@@ -52,7 +40,7 @@ struct TrendingScreen<Destination: View>: View {
                 phase: viewModel.phase,
                 favorites: favorites,
                 imageProvider: imageProvider,
-                onSelect: { selection = $0 },
+                onSelect: { selection = makeDetails($0) },
                 onDisplayIndex: { index in Task { await viewModel.itemDisplayed(at: index) } },
                 onRefresh: { Task { await viewModel.refresh() } },
                 onRetry: { Task { await viewModel.retry() } },
