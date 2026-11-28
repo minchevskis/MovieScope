@@ -1,7 +1,8 @@
 import MovieScopeCore
 import UIKit
 
-/// A wide backdrop card for the featured row, with the title over a gradient.
+/// A wide backdrop card for the featured row, with the title and a one-line
+/// description over a gradient.
 final class FeaturedCell: UICollectionViewCell {
     static let reuseIdentifier = "FeaturedCell"
 
@@ -9,6 +10,7 @@ final class FeaturedCell: UICollectionViewCell {
     private let placeholderView = ArtworkPlaceholderView()
     private let gradientLayer = CAGradientLayer()
     private let titleLabel = UILabel()
+    private let overviewLabel = UILabel()
     private let ratingBadge = RatingBadgeView()
     private let favoriteBadge = UIImageView(image: UIImage(systemName: "heart.fill"))
     private let imageLoader = CellImageLoader()
@@ -32,6 +34,7 @@ final class FeaturedCell: UICollectionViewCell {
         self.imageProvider = imageProvider
         backdropPath = summary.backdropPath ?? summary.posterPath
         titleLabel.text = summary.title
+        overviewLabel.text = summary.cardDescription
         ratingBadge.setRating(summary.voteAverage, votes: summary.voteCount)
         setFavorite(isFavorite)
         loadBackdrop()
@@ -79,7 +82,7 @@ final class FeaturedCell: UICollectionViewCell {
         backdropView.clipsToBounds = true
         backdropView.onLayout = { [weak self] in self?.loadBackdrop() }
         gradientLayer.colors = [UIColor.clear.cgColor, UIColor.black.withAlphaComponent(0.75).cgColor]
-        gradientLayer.locations = [0.45, 1]
+        gradientLayer.locations = [0.3, 1]
 
         titleLabel.font = .preferredFont(forTextStyle: .title2)
         titleLabel.adjustsFontForContentSizeCategory = true
@@ -88,12 +91,17 @@ final class FeaturedCell: UICollectionViewCell {
         titleLabel.adjustsFontSizeToFitWidth = true
         titleLabel.minimumScaleFactor = 0.7
 
+        overviewLabel.font = .preferredFont(forTextStyle: .subheadline)
+        overviewLabel.adjustsFontForContentSizeCategory = true
+        overviewLabel.textColor = UIColor.white.withAlphaComponent(0.85)
+        overviewLabel.numberOfLines = 1
+
         favoriteBadge.tintColor = .systemPink
         favoriteBadge.isHidden = true
         favoriteBadge.preferredSymbolConfiguration = .init(textStyle: .title3)
 
         // Back to front: placeholder symbol, backdrop (covers it once loaded), text and badges.
-        for view in [placeholderView, backdropView, titleLabel, ratingBadge, favoriteBadge] {
+        for view in [placeholderView, backdropView, titleLabel, overviewLabel, ratingBadge, favoriteBadge] {
             view.translatesAutoresizingMaskIntoConstraints = false
             contentView.addSubview(view)
         }
@@ -109,8 +117,11 @@ final class FeaturedCell: UICollectionViewCell {
             placeholderView.widthAnchor.constraint(equalToConstant: 44),
             placeholderView.heightAnchor.constraint(equalToConstant: 44),
             titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: ratingBadge.leadingAnchor, constant: -12),
-            titleLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -14),
+            titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor, constant: -16),
+            titleLabel.bottomAnchor.constraint(equalTo: overviewLabel.topAnchor, constant: -2),
+            overviewLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            overviewLabel.trailingAnchor.constraint(lessThanOrEqualTo: ratingBadge.leadingAnchor, constant: -12),
+            overviewLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -14),
             ratingBadge.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             ratingBadge.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -16),
             favoriteBadge.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 14),

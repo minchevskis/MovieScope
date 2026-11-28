@@ -1,4 +1,5 @@
 @testable import MovieScope
+import MovieScopeCore
 import UIKit
 import XCTest
 
@@ -12,6 +13,40 @@ final class MediaCellTests: XCTestCase {
 
     func test_gridCell_hasPlaceholderBehindArtwork() throws {
         try assertPlaceholderBehindArtwork(in: MediaGridCell(frame: CGRect(x: 0, y: 0, width: 170, height: 340)))
+    }
+
+    /// The brief: every entity shows a title, an image and a short description.
+    func test_featuredCell_showsShortDescription() {
+        let cell = FeaturedCell(frame: CGRect(x: 0, y: 0, width: 340, height: 220))
+
+        cell.configure(with: .stub(0), isFavorite: false, imageProvider: Self.offlineImageProvider())
+
+        let texts = descendants(of: cell.contentView).compactMap { ($0 as? UILabel)?.text }
+        XCTAssertTrue(texts.contains("Overview 0"), "Labels shown: \(texts)")
+    }
+
+    func test_featuredCell_withoutOverview_saysSo() {
+        let cell = FeaturedCell(frame: CGRect(x: 0, y: 0, width: 340, height: 220))
+        let summary = MediaSummary.stub(0)
+        let blank = MediaSummary(
+            id: summary.id, title: summary.title, overview: "", posterPath: nil, backdropPath: nil,
+            voteAverage: 0, voteCount: 0, releaseDate: nil
+        )
+
+        cell.configure(with: blank, isFavorite: false, imageProvider: Self.offlineImageProvider())
+
+        let texts = descendants(of: cell.contentView).compactMap { ($0 as? UILabel)?.text }
+        XCTAssertTrue(texts.contains("No description available."), "Labels shown: \(texts)")
+    }
+
+    private static func offlineImageProvider() -> ImageProvider {
+        ImageProvider(
+            pipeline: ImagePipeline(transport: NoNetworkTransport()),
+            configurationStore: ImageConfigurationStore(
+                service: FakeTMDBService(),
+                fileURL: FileManager.default.temporaryDirectory.appendingPathComponent("\(UUID()).json")
+            )
+        )
     }
 
     private func assertPlaceholderBehindArtwork(
@@ -30,5 +65,11 @@ final class MediaCellTests: XCTestCase {
 
     private func descendants(of view: UIView) -> [UIView] {
         view.subviews + view.subviews.flatMap(descendants)
+    }
+}
+
+private struct NoNetworkTransport: HTTPTransport {
+    func data(for request: URLRequest) async throws -> (Data, HTTPURLResponse) {
+        throw URLError(.notConnectedToInternet)
     }
 }

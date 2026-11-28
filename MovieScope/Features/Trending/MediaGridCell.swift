@@ -33,7 +33,7 @@ final class MediaGridCell: UICollectionViewCell {
         self.imageProvider = imageProvider
         posterPath = summary.posterPath
         titleLabel.text = summary.title
-        overviewLabel.text = summary.overview.isEmpty ? "No description available." : summary.overview
+        overviewLabel.text = summary.cardDescription
         ratingBadge.setRating(summary.voteAverage, votes: summary.voteCount)
         setFavorite(isFavorite)
         loadPoster()
@@ -153,6 +153,13 @@ final class MediaGridCell: UICollectionViewCell {
 }
 
 /// VoiceOver text for a title card.
+extension MediaSummary {
+    /// A card's short description: the overview, or a note when TMDB has none.
+    var cardDescription: String {
+        overview.isEmpty ? "No description available." : overview
+    }
+}
+
 enum MediaAccessibility {
     static func label(for summary: MediaSummary, isFavorite: Bool) -> String {
         var parts = [summary.title]
