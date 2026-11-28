@@ -8,6 +8,8 @@ import UIKit
 final class ImageProvider {
     private let pipeline: ImagePipeline
     private let configurationStore: ImageConfigurationStore
+    /// The latest prefetch or cancel. Each one waits for the one before it.
+    private var lastPrefetchChange: Task<Void, Never>?
 
     init(pipeline: ImagePipeline, configurationStore: ImageConfigurationStore) {
         self.pipeline = pipeline
@@ -34,16 +36,28 @@ final class ImageProvider {
     }
 
     func prefetch(paths: [String], category: ImageCategory, pointSize: CGSize, scale: CGFloat) {
-        Task {
-            let requests = await requests(paths: paths, category: category, pointSize: pointSize, scale: scale)
-            await pipeline.prefetch(requests)
+        inOrder {
+            let requests = await self.requests(paths: paths, category: category, pointSize: pointSize, scale: scale)
+            await self.pipeline.prefetch(requests)
         }
     }
 
     func cancelPrefetch(paths: [String], category: ImageCategory, pointSize: CGSize, scale: CGFloat) {
-        Task {
-            let requests = await requests(paths: paths, category: category, pointSize: pointSize, scale: scale)
-            await pipeline.cancelPrefetch(requests)
+        inOrder {
+            let requests = await self.requests(paths: paths, category: category, pointSize: pointSize, scale: scale)
+            await self.pipeline.cancelPrefetch(requests)
+        }
+    }
+
+    /// Runs prefetch changes one after another, in the order they were made.
+    /// Each starts with an async configuration lookup, so separate tasks could
+    /// finish out of order, and a cancel that overtook its prefetch would leave
+    /// that download running.
+    private func inOrder(_ change: @escaping @MainActor () async -> Void) {
+        let previous = lastPrefetchChange
+        lastPrefetchChange = Task {
+            await previous?.value
+            await change()
         }
     }
 
